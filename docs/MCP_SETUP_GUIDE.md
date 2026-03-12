@@ -198,7 +198,7 @@ Once configured, your AI can use these JIRA operations:
   "command": "npx",
   "args": ["@modelcontextprotocol/server-github"],
   "env": {
-    "GITHUB_TOKEN": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "GITHUB_TOKEN": "your_github_personal_access_token",
     "GITHUB_OWNER": "myusername",
     "GITHUB_REPO": "my-project"
   }
