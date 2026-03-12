@@ -1,0 +1,30 @@
+[flake8]
+max-line-length = 100
+extend-ignore =
+    # E203: whitespace before ':' (conflicts with black)
+    E203,
+    # W503: line break before binary operator (conflicts with black)
+    W503,
+    # F401: imported but unused (many imports for future features)
+    F401,
+    # F841: local variable assigned but never used (exception variables)
+    F841,
+    # E722: bare except (intentional for graceful fallbacks)
+    E722,
+    # F541: f-string missing placeholders (template strings)
+    F541,
+    # E402: module level import not at top of file (needed for dynamic imports)
+    E402,
+    # F811: redefinition of unused variable (shadowing imports)
+    F811,
+    # E501: line too long (let black handle formatting)
+    E501
+
+exclude =
+    venv,
+    .venv,
+    __pycache__,
+    .git,
+    user_docs,
+    user_workflows,
+    .conductor

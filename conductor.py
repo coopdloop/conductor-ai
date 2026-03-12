@@ -6,33 +6,36 @@ A comprehensive daily workflow orchestrator with documentation processing,
 skill-based workflows, scheduling, and MCP service integration.
 """
 
-import click
-import sys
+import json
 import os
-from pathlib import Path
+import sys
+import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, List
-from rich.console import Console
-from rich.panel import Panel
-from rich.prompt import Prompt, Confirm
-from rich.table import Table
+from pathlib import Path
+from typing import Any, Dict, List
+
+import click
 from rich.columns import Columns
-from rich.text import Text
+from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
-import json
-import time
+from rich.panel import Panel
+from rich.prompt import Confirm, Prompt
+from rich.table import Table
+from rich.text import Text
 
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent / 'src'))
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+from core.doc_processor import DocumentProcessor
+from core.mcp_manager import MCPManager
+from core.scheduler import Scheduler
 
 # Removed simple_workflow - now using AI-native orchestration
 from core.workflow_engine import WorkflowEngine, WorkflowStatus
-from core.scheduler import Scheduler
-from core.doc_processor import DocumentProcessor
-from core.mcp_manager import MCPManager
 
 console = Console()
+
 
 @click.group()
 @click.version_option(version="2.0.0")
@@ -42,51 +45,61 @@ def cli():
 
 
 @cli.command()
-@click.option('--shell', type=click.Choice(['bash', 'zsh', 'fish']),
-              help='Shell type for completion script')
-@click.option('--install', is_flag=True, help='Install completion for current shell')
+@click.option(
+    "--shell",
+    type=click.Choice(["bash", "zsh", "fish"]),
+    help="Shell type for completion script",
+)
+@click.option("--install", is_flag=True, help="Install completion for current shell")
 def completion(shell, install):
     """Generate shell completion scripts for conductor commands."""
     import subprocess
 
     # Detect shell if not provided
     if not shell and not install:
-        current_shell = os.environ.get('SHELL', '').split('/')[-1]
-        if current_shell in ['bash', 'zsh', 'fish']:
+        current_shell = os.environ.get("SHELL", "").split("/")[-1]
+        if current_shell in ["bash", "zsh", "fish"]:
             shell = current_shell
         else:
-            shell = 'bash'  # Default to bash
+            shell = "bash"  # Default to bash
 
     if install:
         # Auto-detect shell for installation
-        current_shell = os.environ.get('SHELL', '').split('/')[-1]
+        current_shell = os.environ.get("SHELL", "").split("/")[-1]
 
-        if current_shell == 'bash':
+        if current_shell == "bash":
             completion_script = "_CONDUCTOR_COMPLETE=bash_source conductor.py"
             config_file = os.path.expanduser("~/.bashrc")
             install_line = f'eval "$({completion_script})"'
 
-        elif current_shell == 'zsh':
+        elif current_shell == "zsh":
             completion_script = "_CONDUCTOR_COMPLETE=zsh_source conductor.py"
             config_file = os.path.expanduser("~/.zshrc")
             install_line = f'eval "$({completion_script})"'
 
-        elif current_shell == 'fish':
+        elif current_shell == "fish":
             completion_script = "_CONDUCTOR_COMPLETE=fish_source conductor.py"
             config_file = os.path.expanduser("~/.config/fish/config.fish")
-            install_line = f'eval ({completion_script})'
+            install_line = f"eval ({completion_script})"
 
         else:
-            console.print("❌ Unsupported shell. Supported shells: bash, zsh, fish", style="red")
+            console.print(
+                "❌ Unsupported shell. Supported shells: bash, zsh, fish", style="red"
+            )
             return
 
         # Check if already installed
         try:
-            with open(config_file, 'r') as f:
+            with open(config_file, "r") as f:
                 content = f.read()
-                if 'conductor.py' in content and 'COMPLETE' in content:
-                    console.print(f"✅ Completion already installed in {config_file}", style="green")
-                    console.print("\n💡 To activate completion in current session, run:")
+                if "conductor.py" in content and "COMPLETE" in content:
+                    console.print(
+                        f"✅ Completion already installed in {config_file}",
+                        style="green",
+                    )
+                    console.print(
+                        "\n💡 To activate completion in current session, run:"
+                    )
                     console.print(f"   [bold]source {config_file}[/bold]")
                     return
         except FileNotFoundError:
@@ -94,7 +107,7 @@ def completion(shell, install):
 
         # Add completion to config file
         try:
-            with open(config_file, 'a') as f:
+            with open(config_file, "a") as f:
                 f.write(f"\n# Conductor CLI completion\n{install_line}\n")
 
             console.print(f"✅ Completion installed to {config_file}", style="green")
@@ -110,11 +123,11 @@ def completion(shell, install):
 
     else:
         # Generate completion script
-        if shell == 'bash':
+        if shell == "bash":
             env_var = "_CONDUCTOR_COMPLETE=bash_source"
-        elif shell == 'zsh':
+        elif shell == "zsh":
             env_var = "_CONDUCTOR_COMPLETE=zsh_source"
-        elif shell == 'fish':
+        elif shell == "fish":
             env_var = "_CONDUCTOR_COMPLETE=fish_source"
         else:
             console.print("❌ Unsupported shell. Use: bash, zsh, or fish", style="red")
@@ -135,9 +148,10 @@ def get_components():
     mcp_manager = MCPManager()
     return workflow_engine, scheduler, doc_processor, mcp_manager
 
+
 @cli.command()
-@click.option('--dashboard', '-d', is_flag=True, help='Show enhanced dashboard')
-@click.option('--auto-start', '-a', is_flag=True, help='Auto-start scheduler')
+@click.option("--dashboard", "-d", is_flag=True, help="Show enhanced dashboard")
+@click.option("--auto-start", "-a", is_flag=True, help="Auto-start scheduler")
 def start(dashboard, auto_start):
     """Start your work day with enhanced dashboard."""
 
@@ -151,25 +165,33 @@ def start(dashboard, auto_start):
         show_dashboard(workflow_engine, scheduler, doc_processor, mcp_manager)
     else:
         # Show simple startup message
-        console.print(Panel.fit(
-            "[bold blue]🌅 Starting Your Work Day[/bold blue]\n"
-            "Conductor is ready!",
-            border_style="blue"
-        ))
-        console.print("\n[green]✅ Ready to start your day! Use 'conductor workflows' or 'conductor start -d' for enhanced view.[/green]")
+        console.print(
+            Panel.fit(
+                "[bold blue]🌅 Starting Your Work Day[/bold blue]\n"
+                "Conductor is ready!",
+                border_style="blue",
+            )
+        )
+        console.print(
+            "\n[green]✅ Ready to start your day! Use 'conductor workflows' or 'conductor start -d' for enhanced view.[/green]"
+        )
 
 
 def show_dashboard(workflow_engine, scheduler, doc_processor, mcp_manager):
     """Show enhanced dashboard with all information."""
 
-    console.print(Panel.fit(
-        "[bold blue]🚀 Enhanced Conductor Dashboard[/bold blue]\n"
-        "Workflow orchestration, documentation, and task management",
-        border_style="blue"
-    ))
+    console.print(
+        Panel.fit(
+            "[bold blue]🚀 Enhanced Conductor Dashboard[/bold blue]\n"
+            "Workflow orchestration, documentation, and task management",
+            border_style="blue",
+        )
+    )
 
     # Get data
-    workflows = workflow_engine.get_active_workflows() + workflow_engine.get_pending_workflows()
+    workflows = (
+        workflow_engine.get_active_workflows() + workflow_engine.get_pending_workflows()
+    )
     priorities = workflow_engine.get_today_priorities()
     reminders = workflow_engine.get_due_reminders()
     scheduler_summary = scheduler.get_schedule_summary()
@@ -180,31 +202,28 @@ def show_dashboard(workflow_engine, scheduler, doc_processor, mcp_manager):
     layout.split_column(
         Layout(name="header", size=3),
         Layout(name="body"),
-        Layout(name="footer", size=3)
+        Layout(name="footer", size=3),
     )
 
-    layout["body"].split_row(
-        Layout(name="left"),
-        Layout(name="right")
-    )
+    layout["body"].split_row(Layout(name="left"), Layout(name="right"))
 
     layout["left"].split_column(
-        Layout(name="workflows", ratio=2),
-        Layout(name="priorities", ratio=1)
+        Layout(name="workflows", ratio=2), Layout(name="priorities", ratio=1)
     )
 
     layout["right"].split_column(
-        Layout(name="schedule", ratio=1),
-        Layout(name="services", ratio=1)
+        Layout(name="schedule", ratio=1), Layout(name="services", ratio=1)
     )
 
     # Header
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    layout["header"].update(Panel(
-        f"[bold]Current Time:[/bold] {current_time}",
-        title="Status",
-        border_style="blue"
-    ))
+    layout["header"].update(
+        Panel(
+            f"[bold]Current Time:[/bold] {current_time}",
+            title="Status",
+            border_style="blue",
+        )
+    )
 
     # Workflows table
     if workflows:
@@ -214,11 +233,19 @@ def show_dashboard(workflow_engine, scheduler, doc_processor, mcp_manager):
         workflows_table.add_column("Priority", style="yellow")
 
         for workflow in workflows[:10]:  # Limit display
-            priority_str = "🔴" if workflow.priority <= 2 else "🟡" if workflow.priority <= 3 else "🟢"
+            priority_str = (
+                "🔴"
+                if workflow.priority <= 2
+                else "🟡" if workflow.priority <= 3 else "🟢"
+            )
             workflows_table.add_row(
-                workflow.title[:50] + "..." if len(workflow.title) > 50 else workflow.title,
+                (
+                    workflow.title[:50] + "..."
+                    if len(workflow.title) > 50
+                    else workflow.title
+                ),
                 workflow.status.value,
-                priority_str
+                priority_str,
             )
         layout["workflows"].update(workflows_table)
     else:
@@ -231,10 +258,16 @@ def show_dashboard(workflow_engine, scheduler, doc_processor, mcp_manager):
         priorities_table.add_column("Due", style="white")
 
         for priority in priorities[:5]:  # Top 5
-            due_str = priority.due_date.split('T')[0] if priority.due_date else "No due date"
+            due_str = (
+                priority.due_date.split("T")[0] if priority.due_date else "No due date"
+            )
             priorities_table.add_row(
-                priority.title[:40] + "..." if len(priority.title) > 40 else priority.title,
-                due_str
+                (
+                    priority.title[:40] + "..."
+                    if len(priority.title) > 40
+                    else priority.title
+                ),
+                due_str,
             )
         layout["priorities"].update(priorities_table)
     else:
@@ -252,16 +285,22 @@ def show_dashboard(workflow_engine, scheduler, doc_processor, mcp_manager):
     # Services status
     services_text = ""
     for service_name, status in service_status.items():
-        status_emoji = "✅" if status['connected'] else "⚠️" if status['configured'] else "❌"
+        status_emoji = (
+            "✅" if status["connected"] else "⚠️" if status["configured"] else "❌"
+        )
         services_text += f"{status_emoji} {service_name.title()}\n"
 
-    layout["services"].update(Panel(services_text.strip() or "No services", title="MCP Services"))
+    layout["services"].update(
+        Panel(services_text.strip() or "No services", title="MCP Services")
+    )
 
     # Footer
-    layout["footer"].update(Panel(
-        "[bold green]Commands:[/bold green] workflows, schedule, docs, services | [bold yellow]Ctrl+C to exit[/bold yellow]",
-        border_style="green"
-    ))
+    layout["footer"].update(
+        Panel(
+            "[bold green]Commands:[/bold green] workflows, schedule, docs, services | [bold yellow]Ctrl+C to exit[/bold yellow]",
+            border_style="green",
+        )
+    )
 
     console.print(layout)
 
@@ -272,32 +311,36 @@ def show_dashboard(workflow_engine, scheduler, doc_processor, mcp_manager):
             console.print(f"• {reminder.message}")
 
 
-
 @cli.command()
-@click.option('--task-id', '-t', help='JIRA task ID')
-@click.option('--time', help='Time spent (e.g., 30m, 2h)')
+@click.option("--task-id", "-t", help="JIRA task ID")
+@click.option("--time", help="Time spent (e.g., 30m, 2h)")
 def log(task_id, time):
     """Log work progress."""
 
-    console.print("[red]❌ Work logging requires AI-native workflow system. Use 'conductor ai chat' instead.[/red]")
+    console.print(
+        "[red]❌ Work logging requires AI-native workflow system. Use 'conductor ai chat' instead.[/red]"
+    )
     return
 
+
 @cli.command()
-@click.option('--title', '-t', help='Documentation title')
-@click.option('--publish', '-p', is_flag=True, help='Publish to targets')
-@click.option('--format', '-f', multiple=True, help='Output formats (html, docx)')
-@click.option('--version', '-v', is_flag=True, help='Create new version if changed')
-@click.option('--file', help='Read content from file instead of input')
+@click.option("--title", "-t", help="Documentation title")
+@click.option("--publish", "-p", is_flag=True, help="Publish to targets")
+@click.option("--format", "-f", multiple=True, help="Output formats (html, docx)")
+@click.option("--version", "-v", is_flag=True, help="Create new version if changed")
+@click.option("--file", help="Read content from file instead of input")
 def docs(title, publish, format, version, file):
     """Create and manage documentation with versioning."""
 
     workflow_engine, scheduler, doc_processor, mcp_manager = get_components()
 
-    console.print(Panel.fit(
-        "[bold blue]📝 Enhanced Documentation System[/bold blue]\n"
-        "Create, version, and publish documentation",
-        border_style="blue"
-    ))
+    console.print(
+        Panel.fit(
+            "[bold blue]📝 Enhanced Documentation System[/bold blue]\n"
+            "Create, version, and publish documentation",
+            border_style="blue",
+        )
+    )
 
     if not title:
         title = Prompt.ask("Documentation title")
@@ -305,7 +348,7 @@ def docs(title, publish, format, version, file):
     # Get content
     if file:
         try:
-            with open(file, 'r', encoding='utf-8') as f:
+            with open(file, "r", encoding="utf-8") as f:
                 content = f.read()
         except Exception as e:
             console.print(f"[red]Error reading file: {e}[/red]")
@@ -318,13 +361,13 @@ def docs(title, publish, format, version, file):
         try:
             while True:
                 line = input()
-                if line.strip() == 'END':
+                if line.strip() == "END":
                     break
                 lines.append(line)
         except EOFError:
             pass
 
-        content = '\n'.join(lines)
+        content = "\n".join(lines)
 
     if not content.strip():
         console.print("[red]No content provided![/red]")
@@ -333,17 +376,16 @@ def docs(title, publish, format, version, file):
     # Create document with versioning
     metadata = {
         "author": os.getenv("USER", "unknown"),
-        "created_with": "Enhanced Conductor"
+        "created_with": "Enhanced Conductor",
     }
 
     doc_result = doc_processor.create_document(
-        title=title,
-        content=content,
-        metadata=metadata,
-        auto_version=version
+        title=title, content=content, metadata=metadata, auto_version=version
     )
 
-    console.print(f"[green]✅ Document created:[/green] {doc_result['title']} v{doc_result['version']}")
+    console.print(
+        f"[green]✅ Document created:[/green] {doc_result['title']} v{doc_result['version']}"
+    )
     console.print(f"📁 Location: {doc_result['file_path']}")
 
     # Convert to additional formats
@@ -353,10 +395,12 @@ def docs(title, publish, format, version, file):
         formats_list = ["html"] if not format else []
 
     if formats_list:
-        convert_result = doc_processor.convert_to_formats(title, "current", formats_list)
-        if convert_result['success']:
+        convert_result = doc_processor.convert_to_formats(
+            title, "current", formats_list
+        )
+        if convert_result["success"]:
             console.print("[blue]🔄 Converted to additional formats:[/blue]")
-            for fmt, path in convert_result['files'].items():
+            for fmt, path in convert_result["files"].items():
                 console.print(f"  • {fmt.upper()}: {path}")
 
     # Publish if requested
@@ -369,20 +413,24 @@ def docs(title, publish, format, version, file):
 
         if targets:
             pub_result = doc_processor.publish_document(title, "current", targets)
-            if pub_result['success']:
+            if pub_result["success"]:
                 console.print("[green]📤 Published successfully![/green]")
-                for target, result in pub_result['published'].items():
-                    if result.get('success'):
-                        console.print(f"  • {target.title()}: {result.get('url', 'Published')}")
+                for target, result in pub_result["published"].items():
+                    if result.get("success"):
+                        console.print(
+                            f"  • {target.title()}: {result.get('url', 'Published')}"
+                        )
             else:
-                console.print(f"[red]❌ Publishing failed: {pub_result.get('errors')}[/red]")
+                console.print(
+                    f"[red]❌ Publishing failed: {pub_result.get('errors')}[/red]"
+                )
 
 
 @cli.command()
-@click.option('--list-all', '-l', is_flag=True, help='List all workflows')
-@click.option('--create', '-c', help='Create new workflow from file')
-@click.option('--status', '-s', help='Update workflow status')
-@click.option('--priority', '-p', is_flag=True, help='Show only high priority')
+@click.option("--list-all", "-l", is_flag=True, help="List all workflows")
+@click.option("--create", "-c", help="Create new workflow from file")
+@click.option("--status", "-s", help="Update workflow status")
+@click.option("--priority", "-p", is_flag=True, help="Show only high priority")
 def workflows(list_all, create, status, priority):
     """Manage workflows and skills."""
 
@@ -391,7 +439,7 @@ def workflows(list_all, create, status, priority):
     if create:
         # Create workflow from markdown file
         try:
-            with open(create, 'r', encoding='utf-8') as f:
+            with open(create, "r", encoding="utf-8") as f:
                 content = f.read()
 
             workflow = workflow_engine.create_workflow_from_markdown(content)
@@ -427,10 +475,12 @@ def workflows(list_all, create, status, priority):
     table.add_column("Due", style="red")
 
     for workflow in workflows_list:
-        priority_emoji = "🔴" if workflow.priority <= 2 else "🟡" if workflow.priority <= 3 else "🟢"
+        priority_emoji = (
+            "🔴" if workflow.priority <= 2 else "🟡" if workflow.priority <= 3 else "🟢"
+        )
         completed_actions = len([a for a in workflow.actions if a.completed])
         actions_str = f"{completed_actions}/{len(workflow.actions)}"
-        due_str = workflow.due_date.split('T')[0] if workflow.due_date else "-"
+        due_str = workflow.due_date.split("T")[0] if workflow.due_date else "-"
 
         table.add_row(
             workflow.id,
@@ -438,7 +488,7 @@ def workflows(list_all, create, status, priority):
             workflow.status.value,
             f"{priority_emoji} {workflow.priority}",
             actions_str,
-            due_str
+            due_str,
         )
 
     console.print(table)
@@ -456,18 +506,14 @@ def workflows(list_all, create, status, priority):
 
             for action in workflow.actions:
                 status_icon = "✅" if action.completed else "⏳"
-                actions_table.add_row(
-                    action.id,
-                    action.description,
-                    status_icon
-                )
+                actions_table.add_row(action.id, action.description, status_icon)
             console.print(actions_table)
 
 
 @cli.command()
-@click.option('--list-tasks', '-l', is_flag=True, help='List scheduled tasks')
-@click.option('--due', '-d', is_flag=True, help='Show only due tasks')
-@click.option('--execute', '-e', is_flag=True, help='Execute due tasks')
+@click.option("--list-tasks", "-l", is_flag=True, help="List scheduled tasks")
+@click.option("--due", "-d", is_flag=True, help="Show only due tasks")
+@click.option("--execute", "-e", is_flag=True, help="Execute due tasks")
 def schedule(list_tasks, due, execute):
     """Manage scheduled tasks and reminders."""
 
@@ -479,7 +525,7 @@ def schedule(list_tasks, due, execute):
 
         if results:
             for result in results:
-                status_icon = "✅" if result['success'] else "❌"
+                status_icon = "✅" if result["success"] else "❌"
                 console.print(f"{status_icon} {result['name']}: {result['message']}")
         else:
             console.print("[green]No tasks due for execution[/green]")
@@ -508,29 +554,35 @@ def schedule(list_tasks, due, execute):
 
     for task in tasks:
         status_icon = "✅" if task.completed else "⏳"
-        next_run = task.next_run.split('T') if task.next_run else ["Never", ""]
-        next_run_str = f"{next_run[0]} {next_run[1][:5]}" if len(next_run) > 1 else next_run[0]
+        next_run = task.next_run.split("T") if task.next_run else ["Never", ""]
+        next_run_str = (
+            f"{next_run[0]} {next_run[1][:5]}" if len(next_run) > 1 else next_run[0]
+        )
 
         table.add_row(
             task.id,
             task.name[:40] + "..." if len(task.name) > 40 else task.name,
             task.callback_type,
             next_run_str,
-            status_icon
+            status_icon,
         )
 
     console.print(table)
 
     # Show summary
     summary = scheduler.get_schedule_summary()
-    console.print(f"\n[bold]Summary:[/bold] {summary['total_tasks']} total, {summary['due_now']} due now, {summary['upcoming_24h']} upcoming")
+    console.print(
+        f"\n[bold]Summary:[/bold] {summary['total_tasks']} total, {summary['due_now']} due now, {summary['upcoming_24h']} upcoming"
+    )
 
 
 @cli.command()
-@click.option('--list-available', '-l', is_flag=True, help='List available services')
-@click.option('--status', '-s', is_flag=True, help='Show services status')
-@click.option('--test', '-t', help='Test specific service')
-@click.option('--configure', '-c', is_flag=True, help='Configure services from environment')
+@click.option("--list-available", "-l", is_flag=True, help="List available services")
+@click.option("--status", "-s", is_flag=True, help="Show services status")
+@click.option("--test", "-t", help="Test specific service")
+@click.option(
+    "--configure", "-c", is_flag=True, help="Configure services from environment"
+)
 def services(list_available, status, test, configure):
     """Manage MCP service integrations."""
 
@@ -541,15 +593,19 @@ def services(list_available, status, test, configure):
         results = mcp_manager.auto_configure_from_env()
 
         for service_name, result in results.items():
-            status_icon = "✅" if result['success'] else "❌"
-            console.print(f"{status_icon} {service_name.title()}: {result.get('status', 'configured' if result['success'] else 'failed')}")
+            status_icon = "✅" if result["success"] else "❌"
+            console.print(
+                f"{status_icon} {service_name.title()}: {result.get('status', 'configured' if result['success'] else 'failed')}"
+            )
         return
 
     if test:
         console.print(f"[blue]🔌 Testing {test} service...[/blue]")
         result = mcp_manager.test_service(test)
-        status_icon = "✅" if result.get('success') else "❌"
-        console.print(f"{status_icon} {test.title()}: {result.get('message', 'Test completed')}")
+        status_icon = "✅" if result.get("success") else "❌"
+        console.print(
+            f"{status_icon} {test.title()}: {result.get('message', 'Test completed')}"
+        )
         return
 
     # Show services
@@ -569,41 +625,50 @@ def services(list_available, status, test, configure):
         table.add_column("Connected", style="yellow")
 
         for service_name, status_info in services_status.items():
-            status_emoji = "✅" if status_info['connected'] else "⚠️" if status_info['configured'] else "❌"
-            configured_icon = "✅" if status_info['configured'] else "❌"
-            connected_icon = "✅" if status_info['connected'] else "❌"
+            status_emoji = (
+                "✅"
+                if status_info["connected"]
+                else "⚠️" if status_info["configured"] else "❌"
+            )
+            configured_icon = "✅" if status_info["configured"] else "❌"
+            connected_icon = "✅" if status_info["connected"] else "❌"
 
             table.add_row(
                 service_name.title(),
                 f"{status_emoji} {status_info['status']}",
                 configured_icon,
-                connected_icon
+                connected_icon,
             )
 
         console.print(table)
 
 
 @cli.command()
-@click.option('--template', '-t', help='Template name to use')
-@click.option('--list-templates', '-l', is_flag=True, help='List available templates')
-@click.option('--title', help='Title for new workflow')
+@click.option("--template", "-t", help="Template name to use")
+@click.option("--list-templates", "-l", is_flag=True, help="List available templates")
+@click.option("--title", help="Title for new workflow")
 def create(template, list_templates, title):
     """Create new workflows from templates."""
 
     workflow_engine, scheduler, doc_processor, mcp_manager = get_components()
 
-    templates_dir = Path('workflows')
+    templates_dir = Path("workflows")
     templates_dir.mkdir(exist_ok=True)
 
     if list_templates:
         # List available templates
-        template_files = list(templates_dir.glob('*_template.md'))
+        template_files = list(templates_dir.glob("*_template.md"))
 
         if not template_files:
             console.print("[yellow]No templates found[/yellow]")
             return
 
-        console.print(Panel.fit("[bold blue]Available Workflow Templates[/bold blue]", border_style="blue"))
+        console.print(
+            Panel.fit(
+                "[bold blue]Available Workflow Templates[/bold blue]",
+                border_style="blue",
+            )
+        )
 
         table = Table(show_header=True, header_style="bold magenta")
         table.add_column("Template", style="cyan")
@@ -611,33 +676,34 @@ def create(template, list_templates, title):
         table.add_column("File", style="yellow")
 
         for template_file in template_files:
-            template_name = template_file.stem.replace('_template', '')
+            template_name = template_file.stem.replace("_template", "")
 
             # Try to read description from frontmatter
             try:
-                with open(template_file, 'r', encoding='utf-8') as f:
+                with open(template_file, "r", encoding="utf-8") as f:
                     content = f.read()
-                    if content.startswith('---'):
-                        parts = content.split('---', 2)
+                    if content.startswith("---"):
+                        parts = content.split("---", 2)
                         if len(parts) >= 3:
                             import yaml
-                            frontmatter = yaml.safe_load(parts[1])
-                            description = frontmatter.get('description', 'No description')
-                        else:
-                            description = 'Template file'
-                    else:
-                        description = 'Template file'
-            except:
-                description = 'Template file'
 
-            table.add_row(
-                template_name,
-                description,
-                template_file.name
-            )
+                            frontmatter = yaml.safe_load(parts[1])
+                            description = frontmatter.get(
+                                "description", "No description"
+                            )
+                        else:
+                            description = "Template file"
+                    else:
+                        description = "Template file"
+            except:
+                description = "Template file"
+
+            table.add_row(template_name, description, template_file.name)
 
         console.print(table)
-        console.print("\n[green]Usage:[/green] conductor create -t template_name --title \"My Workflow\"")
+        console.print(
+            '\n[green]Usage:[/green] conductor create -t template_name --title "My Workflow"'
+        )
         return
 
     if not template:
@@ -651,32 +717,39 @@ def create(template, list_templates, title):
         return
 
     # Read template
-    with open(template_file, 'r', encoding='utf-8') as f:
+    with open(template_file, "r", encoding="utf-8") as f:
         template_content = f.read()
 
     # Customize template
     if title:
         # Update title in frontmatter
-        if template_content.startswith('---'):
-            parts = template_content.split('---', 2)
+        if template_content.startswith("---"):
+            parts = template_content.split("---", 2)
             if len(parts) >= 3:
                 import yaml
-                frontmatter = yaml.safe_load(parts[1])
-                frontmatter['title'] = title
-                frontmatter['status'] = 'pending'  # Reset status
-                frontmatter['created_at'] = datetime.now().isoformat()
 
-                new_content = '---\n'
+                frontmatter = yaml.safe_load(parts[1])
+                frontmatter["title"] = title
+                frontmatter["status"] = "pending"  # Reset status
+                frontmatter["created_at"] = datetime.now().isoformat()
+
+                new_content = "---\n"
                 new_content += yaml.dump(frontmatter, default_flow_style=False)
-                new_content += '---\n'
-                new_content += parts[2].replace(frontmatter.get('title', 'Template'), title, 1)
+                new_content += "---\n"
+                new_content += parts[2].replace(
+                    frontmatter.get("title", "Template"), title, 1
+                )
                 template_content = new_content
 
     # Create workflow
     try:
-        workflow = workflow_engine.create_workflow_from_markdown(template_content, title)
+        workflow = workflow_engine.create_workflow_from_markdown(
+            template_content, title
+        )
 
-        console.print(f"[green]✅ Workflow created from template:[/green] {workflow.title}")
+        console.print(
+            f"[green]✅ Workflow created from template:[/green] {workflow.title}"
+        )
         console.print(f"📋 ID: {workflow.id}")
         console.print(f"🏃 Actions: {len(workflow.actions)}")
         console.print(f"⏰ Reminders: {len(workflow.reminders)}")
@@ -697,9 +770,9 @@ def create(template, list_templates, title):
 
 
 @cli.command()
-@click.option('--repo', '-r', help='GitHub repository (owner/repo)')
-@click.option('--file', '-f', help='File path in repository')
-@click.option('--message', '-m', help='Commit message')
+@click.option("--repo", "-r", help="GitHub repository (owner/repo)")
+@click.option("--file", "-f", help="File path in repository")
+@click.option("--message", "-m", help="Commit message")
 def github(repo, file, message):
     """Update GitHub with work artifacts."""
 
@@ -719,44 +792,48 @@ def github(repo, file, message):
     try:
         while True:
             line = input()
-            if line.strip() == 'END':
+            if line.strip() == "END":
                 break
             lines.append(line)
     except EOFError:
         pass
 
-    content = '\n'.join(lines)
+    content = "\n".join(lines)
 
     if not content.strip():
         console.print("[red]No content provided![/red]")
         return
 
-    console.print("[red]❌ GitHub integration requires AI-native workflow system. Use 'conductor ai chat' for assistance.[/red]")
+    console.print(
+        "[red]❌ GitHub integration requires AI-native workflow system. Use 'conductor ai chat' for assistance.[/red]"
+    )
     return
+
 
 @cli.command()
 def summary():
     """Generate end of day summary."""
 
-    console.print(Panel.fit(
-        "[bold blue]📊 End of Day Summary[/bold blue]",
-        border_style="blue"
-    ))
+    console.print(
+        Panel.fit("[bold blue]📊 End of Day Summary[/bold blue]", border_style="blue")
+    )
 
-    console.print("[red]❌ Summary generation requires AI-native workflow system. Use 'conductor ai ask \"Generate my daily summary\"' instead.[/red]")
+    console.print(
+        "[red]❌ Summary generation requires AI-native workflow system. Use 'conductor ai ask \"Generate my daily summary\"' instead.[/red]"
+    )
     return
+
 
 @cli.command()
 def config():
     """Check and configure integrations."""
 
-    console.print(Panel.fit(
-        "[bold blue]⚙️ Configuration Status[/bold blue]",
-        border_style="blue"
-    ))
+    console.print(
+        Panel.fit("[bold blue]⚙️ Configuration Status[/bold blue]", border_style="blue")
+    )
 
     # Check for .env file
-    env_file = Path('.env')
+    env_file = Path(".env")
     if env_file.exists():
         console.print("[green]✅ .env file found[/green]")
     else:
@@ -777,7 +854,9 @@ GITHUB_TOKEN=your-github-token
     console.print("• JIRA: Optional (for task management)")
     console.print("• Confluence: Optional (for documentation publishing)")
     console.print("• GitHub: Optional (for code/artifact management)")
-    console.print("\n[blue]💡 The tool works offline - integrations are optional![/blue]")
+    console.print(
+        "\n[blue]💡 The tool works offline - integrations are optional![/blue]"
+    )
 
 
 @cli.group()
@@ -786,11 +865,15 @@ def ai():
     pass
 
 
-@ai.command('chat')
-@click.option('--provider', '-p', type=click.Choice(['claude', 'openai']),
-              help='AI provider to use')
-@click.option('--session', '-s', help='Resume existing session ID')
-@click.option('--stream', is_flag=True, help='Stream responses')
+@ai.command("chat")
+@click.option(
+    "--provider",
+    "-p",
+    type=click.Choice(["claude", "openai"]),
+    help="AI provider to use",
+)
+@click.option("--session", "-s", help="Resume existing session ID")
+@click.option("--stream", is_flag=True, help="Stream responses")
 def ai_chat(provider, session, stream):
     """Start AI conversation for workflow management."""
 
@@ -799,9 +882,10 @@ def ai_chat(provider, session, stream):
         # Add src to path for AI imports
         import sys
         from pathlib import Path
-        sys.path.insert(0, str(Path(__file__).parent / 'src'))
-        from ai.orchestrator import AIOrchestrator
+
+        sys.path.insert(0, str(Path(__file__).parent / "src"))
         from ai.context.memory import ConversationMemory
+        from ai.orchestrator import AIOrchestrator
     except ImportError as e:
         console.print(f"[red]❌ AI features not available: {e}[/red]")
         console.print("Make sure aiohttp is installed: pip install aiohttp")
@@ -810,27 +894,31 @@ def ai_chat(provider, session, stream):
     try:
         # Initialize AI orchestrator
         ai_config = {
-            'providers': {
-                'claude': {} if provider != 'openai' else None,
-                'openai': {} if provider == 'openai' else None
+            "providers": {
+                "claude": {} if provider != "openai" else None,
+                "openai": {} if provider == "openai" else None,
             }
         }
         orchestrator = AIOrchestrator(ai_config)
 
         if not orchestrator.providers:
             console.print("[red]❌ No AI providers available[/red]")
-            console.print("Set ANTHROPIC_API_KEY or OPENAI_API_KEY environment variable")
+            console.print(
+                "Set ANTHROPIC_API_KEY or OPENAI_API_KEY environment variable"
+            )
             return
 
         # Show available providers
         providers = orchestrator.list_available_providers()
         if not provider:
-            provider = providers[0]['name'] if providers else 'claude'
+            provider = providers[0]["name"] if providers else "claude"
 
-        console.print(Panel.fit(
-            f"[bold blue]🤖 AI Workflow Assistant ({provider})[/bold blue]",
-            border_style="blue"
-        ))
+        console.print(
+            Panel.fit(
+                f"[bold blue]🤖 AI Workflow Assistant ({provider})[/bold blue]",
+                border_style="blue",
+            )
+        )
 
         # Start or resume session
         import asyncio
@@ -850,8 +938,10 @@ def ai_chat(provider, session, stream):
                 while True:
                     user_input = Prompt.ask("[bold blue]You[/bold blue]")
 
-                    if user_input.lower() in ['quit', 'exit', 'bye']:
-                        console.print("[green]👋 Goodbye! Session saved for later.[/green]")
+                    if user_input.lower() in ["quit", "exit", "bye"]:
+                        console.print(
+                            "[green]👋 Goodbye! Session saved for later.[/green]"
+                        )
                         break
 
                     console.print(f"\n[bold green]AI Assistant[/bold green]:")
@@ -859,13 +949,17 @@ def ai_chat(provider, session, stream):
                     if stream:
                         # Streaming response
                         response_text = ""
-                        async for chunk in await orchestrator.chat(session_id, user_input, stream=True):
-                            console.print(chunk, end='')
+                        async for chunk in await orchestrator.chat(
+                            session_id, user_input, stream=True
+                        ):
+                            console.print(chunk, end="")
                             response_text += chunk
                         console.print()  # New line after streaming
                     else:
                         # Regular response
-                        response = await orchestrator.chat(session_id, user_input, stream=False)
+                        response = await orchestrator.chat(
+                            session_id, user_input, stream=False
+                        )
                         console.print(response.content)
 
                     console.print()  # Extra line for readability
@@ -882,9 +976,9 @@ def ai_chat(provider, session, stream):
         console.print(f"[red]❌ Failed to start AI chat: {e}[/red]")
 
 
-@ai.command('ask')
-@click.argument('question')
-@click.option('--provider', '-p', type=click.Choice(['claude', 'openai']))
+@ai.command("ask")
+@click.argument("question")
+@click.option("--provider", "-p", type=click.Choice(["claude", "openai"]))
 def ai_ask(question, provider):
     """Ask a quick question to the AI assistant."""
 
@@ -892,7 +986,8 @@ def ai_ask(question, provider):
         # Add src to path for AI imports
         import sys
         from pathlib import Path
-        sys.path.insert(0, str(Path(__file__).parent / 'src'))
+
+        sys.path.insert(0, str(Path(__file__).parent / "src"))
         from ai.orchestrator import AIOrchestrator
     except ImportError as e:
         console.print(f"[red]❌ AI features not available: {e}[/red]")
@@ -906,7 +1001,7 @@ def ai_ask(question, provider):
             console.print("[red]❌ No AI providers available[/red]")
             return
 
-        provider = provider or providers[0]['name']
+        provider = provider or providers[0]["name"]
 
         import asyncio
 
@@ -923,7 +1018,7 @@ def ai_ask(question, provider):
         console.print(f"[red]❌ Error: {e}[/red]")
 
 
-@ai.command('status')
+@ai.command("status")
 def ai_status():
     """Show AI provider status and capabilities."""
 
@@ -931,7 +1026,8 @@ def ai_status():
         # Add src to path for AI imports
         import sys
         from pathlib import Path
-        sys.path.insert(0, str(Path(__file__).parent / 'src'))
+
+        sys.path.insert(0, str(Path(__file__).parent / "src"))
         from ai.orchestrator import AIOrchestrator
     except ImportError as e:
         console.print(f"[red]❌ AI features not available: {e}[/red]")
@@ -941,10 +1037,11 @@ def ai_status():
         orchestrator = AIOrchestrator()
         providers = orchestrator.list_available_providers()
 
-        console.print(Panel.fit(
-            "[bold blue]🤖 AI Provider Status[/bold blue]",
-            border_style="blue"
-        ))
+        console.print(
+            Panel.fit(
+                "[bold blue]🤖 AI Provider Status[/bold blue]", border_style="blue"
+            )
+        )
 
         if not providers:
             console.print("[yellow]⚠️ No AI providers configured[/yellow]")
@@ -959,23 +1056,19 @@ def ai_status():
         table.add_column("Capabilities", style="green")
 
         for provider in providers:
-            capabilities = ', '.join(provider['capabilities'][:3])  # Show first 3
-            if len(provider['capabilities']) > 3:
+            capabilities = ", ".join(provider["capabilities"][:3])  # Show first 3
+            if len(provider["capabilities"]) > 3:
                 capabilities += f" (+{len(provider['capabilities'])-3} more)"
 
-            table.add_row(
-                provider['name'],
-                provider['model'],
-                capabilities
-            )
+            table.add_row(provider["name"], provider["model"], capabilities)
 
         console.print(table)
 
         # Show skills info
         from skills.base import SkillRegistry
+        from skills.daily_ops import DailyOperationsSkills
         from skills.documentation import DocumentationSkills
         from skills.project_mgmt import ProjectManagementSkills
-        from skills.daily_ops import DailyOperationsSkills
 
         registry = SkillRegistry()
         DocumentationSkills.register_all(registry)
@@ -985,25 +1078,31 @@ def ai_status():
         skills = registry.list_skills()
 
         console.print(f"\n[bold blue]Available Skills:[/bold blue] {len(skills)}")
-        console.print(f"• Documentation: {len([s for s in skills if s['category'] == 'documentation'])}")
-        console.print(f"• Project Management: {len([s for s in skills if s['category'] == 'project_mgmt'])}")
-        console.print(f"• Daily Operations: {len([s for s in skills if s['category'] == 'daily_ops'])}")
+        console.print(
+            f"• Documentation: {len([s for s in skills if s['category'] == 'documentation'])}"
+        )
+        console.print(
+            f"• Project Management: {len([s for s in skills if s['category'] == 'project_mgmt'])}"
+        )
+        console.print(
+            f"• Daily Operations: {len([s for s in skills if s['category'] == 'daily_ops'])}"
+        )
 
     except Exception as e:
         console.print(f"[red]❌ Error checking AI status: {e}[/red]")
 
 
-@ai.command('skills')
-@click.option('--category', '-c', help='Filter by category')
-@click.option('--detail', is_flag=True, help='Show detailed information')
+@ai.command("skills")
+@click.option("--category", "-c", help="Filter by category")
+@click.option("--detail", is_flag=True, help="Show detailed information")
 def ai_skills(category, detail):
     """List available AI skills and capabilities."""
 
     try:
         from skills.base import SkillRegistry
+        from skills.daily_ops import DailyOperationsSkills
         from skills.documentation import DocumentationSkills
         from skills.project_mgmt import ProjectManagementSkills
-        from skills.daily_ops import DailyOperationsSkills
 
         registry = SkillRegistry()
         DocumentationSkills.register_all(registry)
@@ -1012,10 +1111,11 @@ def ai_skills(category, detail):
 
         skills = registry.list_skills(category)
 
-        console.print(Panel.fit(
-            "[bold blue]🛠️ Available AI Skills[/bold blue]",
-            border_style="blue"
-        ))
+        console.print(
+            Panel.fit(
+                "[bold blue]🛠️ Available AI Skills[/bold blue]", border_style="blue"
+            )
+        )
 
         if category:
             console.print(f"[bold]Category:[/bold] {category}")
@@ -1032,9 +1132,11 @@ def ai_skills(category, detail):
 
             if detail:
                 console.print(f"  Parameters:")
-                for param in skill['parameters']:
-                    required = " (required)" if param['required'] else " (optional)"
-                    console.print(f"    • {param['name']}: {param['description']}{required}")
+                for param in skill["parameters"]:
+                    required = " (required)" if param["required"] else " (optional)"
+                    console.print(
+                        f"    • {param['name']}: {param['description']}{required}"
+                    )
 
             console.print()
 
@@ -1042,5 +1144,5 @@ def ai_skills(category, detail):
         console.print(f"[red]❌ Error listing skills: {e}[/red]")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

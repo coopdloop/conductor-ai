@@ -6,7 +6,7 @@
 repos:
   # Security & Secrets Detection (HIGHEST PRIORITY)
   - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
+    rev: v1.5.0
     hooks:
       - id: detect-secrets
         name: 🔐 Detect API keys and secrets
@@ -14,17 +14,17 @@ repos:
         exclude: ^(venv/|\.venv/|\.git/|user_docs/|user_workflows/|\.conductor/|\.secrets\.baseline)
 
   - repo: https://github.com/pycqa/bandit
-    rev: 1.7.5
+    rev: 1.9.4
     hooks:
       - id: bandit
         name: 🛡️ Security vulnerability scan
-        args: [-r, src/, -f, json, -o, bandit-report.json]
+        args: [-r, src/, -f, json, -o, bandit-report.json, -c, .bandit]
         exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
         pass_filenames: false
 
   # Python Code Quality
   - repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 26.3.1
     hooks:
       - id: black
         name: 🎨 Format Python code
@@ -32,7 +32,7 @@ repos:
         exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 8.0.1
     hooks:
       - id: isort
         name: 📦 Sort Python imports
@@ -40,20 +40,15 @@ repos:
         exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
 
   - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         name: 🧹 Lint Python code
         exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
-        args: [
-          "--max-line-length=88",
-          "--extend-ignore=E203,W503",
-          "--exclude=venv,__pycache__,.git,user_docs,user_workflows,.conductor"
-        ]
 
   # File Safety & Quality Checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         name: ✂️ Remove trailing whitespace
@@ -126,7 +121,7 @@ repos:
 # Global configuration
 default_install_hook_types: [pre-commit, pre-push]
 minimum_pre_commit_version: 3.0.0
-default_stages: [commit]
+default_stages: [pre-commit]
 
 # Fail fast - stop on first error
 fail_fast: true

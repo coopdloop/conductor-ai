@@ -1,17 +1,19 @@
+import hashlib
+import json
 import os
 import shutil
-from pathlib import Path
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import markdown
-import json
-import hashlib
-from dataclasses import dataclass, asdict
 
 
 @dataclass
 class DocumentVersion:
     """Represents a version of a document."""
+
     version: str
     content: str
     metadata: Dict[str, Any]
@@ -24,14 +26,16 @@ class DocumentProcessor:
 
     def __init__(self, base_dir: Path = None):
         # User-generated content should go to gitignored directory
-        self.base_dir = base_dir or Path('user_docs')
+        self.base_dir = base_dir or Path("user_docs")
         self.base_dir.mkdir(exist_ok=True)
 
-    def create_document(self,
-                       title: str,
-                       content: str,
-                       metadata: Optional[Dict[str, Any]] = None,
-                       auto_version: bool = True) -> Dict[str, Any]:
+    def create_document(
+        self,
+        title: str,
+        content: str,
+        metadata: Optional[Dict[str, Any]] = None,
+        auto_version: bool = True,
+    ) -> Dict[str, Any]:
         """Create or update a document with versioning."""
 
         # Sanitize title for file system
@@ -40,7 +44,7 @@ class DocumentProcessor:
         doc_dir.mkdir(exist_ok=True)
 
         # Calculate content hash for change detection
-        content_hash = hashlib.md5(content.encode()).hexdigest()
+        content_hash = hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
 
         # Check if document exists and content changed
         if auto_version and self._content_changed(doc_dir, content_hash):
@@ -54,17 +58,17 @@ class DocumentProcessor:
             "version": version,
             "created_at": datetime.now().isoformat(),
             "hash": content_hash,
-            **(metadata or {})
+            **(metadata or {}),
         }
 
         # Save version
         version_file = doc_dir / f"v{version}.md"
-        with open(version_file, 'w', encoding='utf-8') as f:
+        with open(version_file, "w", encoding="utf-8") as f:
             f.write(content)
 
         # Save metadata
         meta_file = doc_dir / f"v{version}.json"
-        with open(meta_file, 'w', encoding='utf-8') as f:
+        with open(meta_file, "w", encoding="utf-8") as f:
             json.dump(version_metadata, f, indent=2)
 
         # Update current symlink
@@ -86,7 +90,7 @@ class DocumentProcessor:
             "file_path": str(version_file),
             "directory": str(doc_dir),
             "hash": content_hash,
-            "is_new_version": version != "1.0"
+            "is_new_version": version != "1.0",
         }
 
     def get_document_versions(self, title: str) -> List[DocumentVersion]:
@@ -103,31 +107,32 @@ class DocumentProcessor:
             meta_file = doc_dir / f"v{version_num}.json"
 
             # Read content
-            with open(version_file, 'r', encoding='utf-8') as f:
+            with open(version_file, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # Read metadata
             metadata = {}
             if meta_file.exists():
-                with open(meta_file, 'r', encoding='utf-8') as f:
+                with open(meta_file, "r", encoding="utf-8") as f:
                     metadata = json.load(f)
 
-            versions.append(DocumentVersion(
-                version=version_num,
-                content=content,
-                metadata=metadata,
-                created_at=metadata.get('created_at', ''),
-                hash=metadata.get('hash', '')
-            ))
+            versions.append(
+                DocumentVersion(
+                    version=version_num,
+                    content=content,
+                    metadata=metadata,
+                    created_at=metadata.get("created_at", ""),
+                    hash=metadata.get("hash", ""),
+                )
+            )
 
         # Sort by version
-        versions.sort(key=lambda v: [int(x) for x in v.version.split('.')])
+        versions.sort(key=lambda v: [int(x) for x in v.version.split(".")])
         return versions
 
-    def convert_to_formats(self,
-                          title: str,
-                          version: str = "current",
-                          formats: List[str] = None) -> Dict[str, Any]:
+    def convert_to_formats(
+        self, title: str, version: str = "current", formats: List[str] = None
+    ) -> Dict[str, Any]:
         """Convert document to multiple formats."""
         if formats is None:
             formats = ["html", "docx"]
@@ -144,7 +149,7 @@ class DocumentProcessor:
             return {"success": False, "error": f"Document {title} v{version} not found"}
 
         # Read markdown content
-        with open(source_file, 'r', encoding='utf-8') as f:
+        with open(source_file, "r", encoding="utf-8") as f:
             md_content = f.read()
 
         results = {"success": True, "files": {}}
@@ -152,8 +157,7 @@ class DocumentProcessor:
         # Convert to HTML
         if "html" in formats:
             html_content = markdown.markdown(
-                md_content,
-                extensions=['tables', 'fenced_code', 'toc', 'codehilite']
+                md_content, extensions=["tables", "fenced_code", "toc", "codehilite"]
             )
 
             # Wrap in full HTML document
@@ -179,7 +183,7 @@ class DocumentProcessor:
 </html>"""
 
             html_file = doc_dir / f"v{version}.html"
-            with open(html_file, 'w', encoding='utf-8') as f:
+            with open(html_file, "w", encoding="utf-8") as f:
                 f.write(full_html)
             results["files"]["html"] = str(html_file)
 
@@ -196,13 +200,13 @@ class DocumentProcessor:
 
                 # Convert markdown to basic docx
                 # This is a simplified conversion - could be enhanced
-                lines = md_content.split('\n')
+                lines = md_content.split("\n")
                 for line in lines:
-                    if line.startswith('# '):
+                    if line.startswith("# "):
                         doc.add_heading(line[2:], level=1)
-                    elif line.startswith('## '):
+                    elif line.startswith("## "):
                         doc.add_heading(line[3:], level=2)
-                    elif line.startswith('### '):
+                    elif line.startswith("### "):
                         doc.add_heading(line[4:], level=3)
                     elif line.strip():
                         doc.add_paragraph(line)
@@ -213,15 +217,19 @@ class DocumentProcessor:
 
             except ImportError:
                 results["errors"] = results.get("errors", [])
-                results["errors"].append("python-docx not available for DOCX conversion")
+                results["errors"].append(
+                    "python-docx not available for DOCX conversion"
+                )
 
         return results
 
-    def publish_document(self,
-                        title: str,
-                        version: str = "current",
-                        targets: List[str] = None,
-                        target_configs: Dict[str, Any] = None) -> Dict[str, Any]:
+    def publish_document(
+        self,
+        title: str,
+        version: str = "current",
+        targets: List[str] = None,
+        target_configs: Dict[str, Any] = None,
+    ) -> Dict[str, Any]:
         """Publish document to various targets."""
         if targets is None:
             targets = []
@@ -242,12 +250,12 @@ class DocumentProcessor:
             return {"success": False, "error": f"Document {title} v{version} not found"}
 
         # Read content and metadata
-        with open(source_file, 'r', encoding='utf-8') as f:
+        with open(source_file, "r", encoding="utf-8") as f:
             content = f.read()
 
         metadata = {}
         if metadata_file.exists():
-            with open(metadata_file, 'r', encoding='utf-8') as f:
+            with open(metadata_file, "r", encoding="utf-8") as f:
                 metadata = json.load(f)
 
         results = {"success": True, "published": {}, "errors": []}
@@ -255,10 +263,14 @@ class DocumentProcessor:
         for target in targets:
             try:
                 if target == "confluence":
-                    result = self._publish_to_confluence(title, content, metadata, target_configs.get("confluence", {}))
+                    result = self._publish_to_confluence(
+                        title, content, metadata, target_configs.get("confluence", {})
+                    )
                     results["published"]["confluence"] = result
                 elif target == "github":
-                    result = self._publish_to_github(title, content, metadata, target_configs.get("github", {}))
+                    result = self._publish_to_github(
+                        title, content, metadata, target_configs.get("github", {})
+                    )
                     results["published"]["github"] = result
                 else:
                     results["errors"].append(f"Unknown publish target: {target}")
@@ -268,7 +280,9 @@ class DocumentProcessor:
 
         return results
 
-    def get_document_diff(self, title: str, version1: str, version2: str) -> Dict[str, Any]:
+    def get_document_diff(
+        self, title: str, version1: str, version2: str
+    ) -> Dict[str, Any]:
         """Get diff between two document versions."""
         versions = self.get_document_versions(title)
 
@@ -296,12 +310,18 @@ class DocumentProcessor:
             v2_line = v2_lines[i] if i < len(v2_lines) else ""
 
             if v1_line != v2_line:
-                changes.append({
-                    "line_number": i + 1,
-                    "old": v1_line,
-                    "new": v2_line,
-                    "type": "modified" if v1_line and v2_line else ("added" if v2_line else "deleted")
-                })
+                changes.append(
+                    {
+                        "line_number": i + 1,
+                        "old": v1_line,
+                        "new": v2_line,
+                        "type": (
+                            "modified"
+                            if v1_line and v2_line
+                            else ("added" if v2_line else "deleted")
+                        ),
+                    }
+                )
 
         return {
             "success": True,
@@ -309,13 +329,13 @@ class DocumentProcessor:
             "version1": version1,
             "version2": version2,
             "changes": changes,
-            "changes_count": len(changes)
+            "changes_count": len(changes),
         }
 
     def _sanitize_filename(self, title: str) -> str:
         """Convert title to safe filename."""
-        safe = "".join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
-        safe = safe.replace(' ', '_').lower()
+        safe = "".join(c for c in title if c.isalnum() or c in (" ", "-", "_")).strip()
+        safe = safe.replace(" ", "_").lower()
         return safe[:50]  # Limit length
 
     def _content_changed(self, doc_dir: Path, new_hash: str) -> bool:
@@ -325,9 +345,9 @@ class DocumentProcessor:
             return True
 
         try:
-            with open(current_meta, 'r', encoding='utf-8') as f:
+            with open(current_meta, "r", encoding="utf-8") as f:
                 metadata = json.load(f)
-                return metadata.get('hash') != new_hash
+                return metadata.get("hash") != new_hash
         except:
             return True
 
@@ -337,7 +357,7 @@ class DocumentProcessor:
         if not current_version:
             return "1.0"
 
-        major, minor = map(int, current_version.split('.'))
+        major, minor = map(int, current_version.split("."))
         return f"{major}.{minor + 1}"
 
     def _get_current_version(self, doc_dir: Path) -> Optional[str]:
@@ -347,18 +367,30 @@ class DocumentProcessor:
             return None
 
         try:
-            with open(current_meta, 'r', encoding='utf-8') as f:
+            with open(current_meta, "r", encoding="utf-8") as f:
                 metadata = json.load(f)
-                return metadata.get('version')
+                return metadata.get("version")
         except:
             return None
 
-    def _publish_to_confluence(self, title: str, content: str, metadata: Dict, config: Dict) -> Dict[str, Any]:
+    def _publish_to_confluence(
+        self, title: str, content: str, metadata: Dict, config: Dict
+    ) -> Dict[str, Any]:
         """Publish to Confluence."""
         # This would integrate with the Confluence MCP service
-        return {"success": True, "url": f"https://confluence.example.com/pages/{title}", "message": "Published to Confluence"}
+        return {
+            "success": True,
+            "url": f"https://confluence.example.com/pages/{title}",
+            "message": "Published to Confluence",
+        }
 
-    def _publish_to_github(self, title: str, content: str, metadata: Dict, config: Dict) -> Dict[str, Any]:
+    def _publish_to_github(
+        self, title: str, content: str, metadata: Dict, config: Dict
+    ) -> Dict[str, Any]:
         """Publish to GitHub."""
         # This would integrate with the GitHub MCP service
-        return {"success": True, "url": f"https://github.com/user/repo/blob/main/{title}.md", "message": "Published to GitHub"}
+        return {
+            "success": True,
+            "url": f"https://github.com/user/repo/blob/main/{title}.md",
+            "message": "Published to GitHub",
+        }

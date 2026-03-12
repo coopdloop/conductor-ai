@@ -1,12 +1,13 @@
 """Claude Provider for Anthropic's Claude models"""
 
-import os
-import json
-from typing import Dict, Any, List, Optional, AsyncGenerator
-import aiohttp
 import asyncio
+import json
+import os
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
-from ai.providers.base import AIProvider, AIResponse, AIProviderError, AICapability
+import aiohttp
+
+from ai.providers.base import AICapability, AIProvider, AIProviderError, AIResponse
 
 
 class ClaudeProvider(AIProvider):
@@ -19,13 +20,15 @@ class ClaudeProvider(AIProvider):
             "max_tokens": 4096,
             "temperature": 0.1,
             "api_key": os.getenv("ANTHROPIC_API_KEY"),
-            "base_url": "https://api.anthropic.com/v1"
+            "base_url": "https://api.anthropic.com/v1",
         }
         default_config.update(config)
         super().__init__(default_config)
 
         if not self.config.get("api_key"):
-            raise AIProviderError("Claude API key not provided. Set ANTHROPIC_API_KEY environment variable.")
+            raise AIProviderError(
+                "Claude API key not provided. Set ANTHROPIC_API_KEY environment variable."
+            )
 
     @property
     def name(self) -> str:
@@ -41,7 +44,7 @@ class ClaudeProvider(AIProvider):
             # AICapability.FUNCTION_CALLING,  # Temporarily disabled due to API format changes
             AICapability.STRUCTURED_OUTPUT,
             AICapability.STREAMING,
-            AICapability.CONTEXT_EXTENSION
+            AICapability.CONTEXT_EXTENSION,
         ]
 
     def _format_messages(self, messages: List[Dict[str, str]]) -> List[Dict[str, str]]:
@@ -54,10 +57,7 @@ class ClaudeProvider(AIProvider):
                 # System messages are handled separately in Claude
                 continue
             elif role in ["user", "assistant"]:
-                formatted.append({
-                    "role": role,
-                    "content": msg["content"]
-                })
+                formatted.append({"role": role, "content": msg["content"]})
         return formatted
 
     async def generate(
@@ -65,14 +65,14 @@ class ClaudeProvider(AIProvider):
         messages: List[Dict[str, str]],
         tools: Optional[List[Dict[str, Any]]] = None,
         system_prompt: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> AIResponse:
         """Generate response using Claude API"""
         try:
             headers = {
                 "Content-Type": "application/json",
                 "x-api-key": self.config["api_key"],
-                "anthropic-version": "2023-06-01"
+                "anthropic-version": "2023-06-01",
             }
 
             # Extract system message if present
@@ -88,7 +88,7 @@ class ClaudeProvider(AIProvider):
                 "model": self.model,
                 "max_tokens": kwargs.get("max_tokens", self.config["max_tokens"]),
                 "temperature": kwargs.get("temperature", self.config["temperature"]),
-                "messages": self._format_messages(messages)
+                "messages": self._format_messages(messages),
             }
 
             if system_message:
@@ -101,7 +101,7 @@ class ClaudeProvider(AIProvider):
                 async with session.post(
                     f"{self.config['base_url']}/messages",
                     headers=headers,
-                    json=request_data
+                    json=request_data,
                 ) as response:
                     if response.status != 200:
                         error_text = await response.text()
@@ -118,17 +118,19 @@ class ClaudeProvider(AIProvider):
                             if item["type"] == "text":
                                 content += item["text"]
                             elif item["type"] == "tool_use":
-                                function_calls.append({
-                                    "name": item["name"],
-                                    "arguments": item["input"],
-                                    "id": item.get("id")
-                                })
+                                function_calls.append(
+                                    {
+                                        "name": item["name"],
+                                        "arguments": item["input"],
+                                        "id": item.get("id"),
+                                    }
+                                )
 
                     return AIResponse(
                         content=content,
                         usage=result.get("usage", {}),
                         function_calls=function_calls,
-                        metadata={"model": self.model, "provider": "claude"}
+                        metadata={"model": self.model, "provider": "claude"},
                     )
 
         except aiohttp.ClientError as e:
@@ -141,7 +143,7 @@ class ClaudeProvider(AIProvider):
         messages: List[Dict[str, str]],
         tools: Optional[List[Dict[str, Any]]] = None,
         system_prompt: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> AsyncGenerator[str, None]:
         """Stream response using Claude API"""
         # For now, fall back to regular generation and yield the result
@@ -155,7 +157,9 @@ class ClaudeProvider(AIProvider):
 
         if "current_workflow" in context:
             workflow = context["current_workflow"]
-            formatted.append(f"\n## Active Workflow: {workflow.get('title', 'Untitled')}")
+            formatted.append(
+                f"\n## Active Workflow: {workflow.get('title', 'Untitled')}"
+            )
             formatted.append(f"- **Status:** {workflow.get('status', 'unknown')}")
             formatted.append(f"- **Priority:** {workflow.get('priority', 'medium')}")
             formatted.append(f"- **ID:** {workflow.get('id', 'unknown')}")
@@ -167,28 +171,32 @@ class ClaudeProvider(AIProvider):
                 formatted.append("\n### Current Actions:")
                 for i, action in enumerate(workflow["actions"], 1):
                     status = "✅ Completed" if action.get("completed") else "⏳ Pending"
-                    formatted.append(f"{i}. **{status}** - {action.get('description', 'No description')}")
+                    formatted.append(
+                        f"{i}. **{status}** - {action.get('description', 'No description')}"
+                    )
                     if action.get("notes"):
                         formatted.append(f"   *Notes: {action['notes']}*")
 
         if "recent_activity" in context:
             formatted.append("\n## Recent Activity:")
             for activity in context["recent_activity"][-5:]:  # Last 5 activities
-                formatted.append(f"- {activity.get('timestamp', 'Unknown time')}: {activity.get('description', 'No description')}")
+                formatted.append(
+                    f"- {activity.get('timestamp', 'Unknown time')}: {activity.get('description', 'No description')}"
+                )
 
         if "schedule" in context and context["schedule"]:
             formatted.append("\n## Today's Schedule:")
             for item in context["schedule"]:
-                time_str = item.get('time', 'No time')
-                desc = item.get('description', 'No description')
-                priority = item.get('priority', 'normal')
+                time_str = item.get("time", "No time")
+                desc = item.get("description", "No description")
+                priority = item.get("priority", "normal")
                 formatted.append(f"- **{time_str}** ({priority} priority): {desc}")
 
         if "related_workflows" in context and context["related_workflows"]:
             formatted.append("\n## Related Workflows:")
             for workflow in context["related_workflows"]:
-                title = workflow.get('title', 'Untitled')
-                status = workflow.get('status', 'unknown')
+                title = workflow.get("title", "Untitled")
+                status = workflow.get("status", "unknown")
                 formatted.append(f"- **{title}** - Status: {status}")
 
         return "\n".join(formatted)

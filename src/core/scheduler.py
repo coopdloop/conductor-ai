@@ -1,11 +1,11 @@
 import json
-import time
 import threading
-from pathlib import Path
+import time
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Callable
-from dataclasses import dataclass, asdict
 from enum import Enum
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 
 class ScheduleType(Enum):
@@ -19,6 +19,7 @@ class ScheduleType(Enum):
 @dataclass
 class ScheduledTask:
     """Represents a scheduled task."""
+
     id: str
     name: str
     description: str
@@ -37,10 +38,10 @@ class Scheduler:
     """Handles scheduling and reminders for workflows."""
 
     def __init__(self, data_dir: Path = None):
-        self.data_dir = data_dir or Path('.conductor')
+        self.data_dir = data_dir or Path(".conductor")
         self.data_dir.mkdir(exist_ok=True)
 
-        self.schedule_file = self.data_dir / 'schedule.json'
+        self.schedule_file = self.data_dir / "schedule.json"
         self.tasks: Dict[str, ScheduledTask] = {}
         self.callbacks: Dict[str, Callable] = {}
         self.running = False
@@ -53,12 +54,14 @@ class Scheduler:
         """Register a callback function for a specific type."""
         self.callbacks[callback_type] = callback_func
 
-    def schedule_reminder(self,
-                         message: str,
-                         scheduled_for: datetime,
-                         recurring: bool = False,
-                         schedule_type: ScheduleType = ScheduleType.ONCE,
-                         metadata: Dict[str, Any] = None) -> str:
+    def schedule_reminder(
+        self,
+        message: str,
+        scheduled_for: datetime,
+        recurring: bool = False,
+        schedule_type: ScheduleType = ScheduleType.ONCE,
+        metadata: Dict[str, Any] = None,
+    ) -> str:
         """Schedule a reminder."""
 
         task_id = self._generate_task_id(message)
@@ -70,24 +73,23 @@ class Scheduler:
             schedule_type=schedule_type,
             scheduled_for=scheduled_for.isoformat(),
             callback_type="reminder",
-            callback_params={
-                "message": message,
-                "metadata": metadata or {}
-            },
+            callback_params={"message": message, "metadata": metadata or {}},
             recurring=recurring,
             next_run=scheduled_for.isoformat(),
-            created_at=datetime.now().isoformat()
+            created_at=datetime.now().isoformat(),
         )
 
         self.tasks[task_id] = task
         self.save_schedule()
         return task_id
 
-    def schedule_workflow_action(self,
-                                workflow_id: str,
-                                action_id: str,
-                                scheduled_for: datetime,
-                                action_description: str = "") -> str:
+    def schedule_workflow_action(
+        self,
+        workflow_id: str,
+        action_id: str,
+        scheduled_for: datetime,
+        action_description: str = "",
+    ) -> str:
         """Schedule a workflow action to be executed."""
 
         task_id = self._generate_task_id(f"workflow_{workflow_id}_{action_id}")
@@ -102,23 +104,25 @@ class Scheduler:
             callback_params={
                 "workflow_id": workflow_id,
                 "action_id": action_id,
-                "description": action_description
+                "description": action_description,
             },
             next_run=scheduled_for.isoformat(),
-            created_at=datetime.now().isoformat()
+            created_at=datetime.now().isoformat(),
         )
 
         self.tasks[task_id] = task
         self.save_schedule()
         return task_id
 
-    def schedule_custom_task(self,
-                           name: str,
-                           callback_type: str,
-                           scheduled_for: datetime,
-                           params: Dict[str, Any],
-                           recurring: bool = False,
-                           schedule_type: ScheduleType = ScheduleType.ONCE) -> str:
+    def schedule_custom_task(
+        self,
+        name: str,
+        callback_type: str,
+        scheduled_for: datetime,
+        params: Dict[str, Any],
+        recurring: bool = False,
+        schedule_type: ScheduleType = ScheduleType.ONCE,
+    ) -> str:
         """Schedule a custom task."""
 
         task_id = self._generate_task_id(name)
@@ -126,14 +130,14 @@ class Scheduler:
         task = ScheduledTask(
             id=task_id,
             name=name,
-            description=params.get('description', name),
+            description=params.get("description", name),
             schedule_type=schedule_type,
             scheduled_for=scheduled_for.isoformat(),
             callback_type=callback_type,
             callback_params=params,
             recurring=recurring,
             next_run=scheduled_for.isoformat(),
-            created_at=datetime.now().isoformat()
+            created_at=datetime.now().isoformat(),
         )
 
         self.tasks[task_id] = task
@@ -192,7 +196,7 @@ class Scheduler:
             "executed_at": datetime.now().isoformat(),
             "success": False,
             "message": "",
-            "output": None
+            "output": None,
         }
 
         try:
@@ -203,7 +207,9 @@ class Scheduler:
                 result["success"] = True
                 result["message"] = "Task executed successfully"
             else:
-                result["message"] = f"No callback registered for type: {task.callback_type}"
+                result["message"] = (
+                    f"No callback registered for type: {task.callback_type}"
+                )
 
             # Update task
             task.last_run = datetime.now().isoformat()
@@ -298,7 +304,7 @@ class Scheduler:
                 "last_run": task.last_run,
                 "next_run": task.next_run,
                 "recurring": task.recurring,
-                "schedule_type": task.schedule_type.value
+                "schedule_type": task.schedule_type.value,
             }
         return None
 
@@ -307,8 +313,8 @@ class Scheduler:
 
         def reminder_callback(params: Dict[str, Any]) -> Dict[str, Any]:
             """Handle reminder callbacks."""
-            message = params.get('message', 'Reminder')
-            metadata = params.get('metadata', {})
+            message = params.get("message", "Reminder")
+            metadata = params.get("metadata", {})
 
             # This could be enhanced to send notifications
             # For now, just return the reminder info
@@ -316,14 +322,14 @@ class Scheduler:
                 "type": "reminder",
                 "message": message,
                 "timestamp": datetime.now().isoformat(),
-                "metadata": metadata
+                "metadata": metadata,
             }
 
         def workflow_action_callback(params: Dict[str, Any]) -> Dict[str, Any]:
             """Handle workflow action callbacks."""
-            workflow_id = params.get('workflow_id')
-            action_id = params.get('action_id')
-            description = params.get('description', '')
+            workflow_id = params.get("workflow_id")
+            action_id = params.get("action_id")
+            description = params.get("description", "")
 
             # This would integrate with the workflow engine
             return {
@@ -332,7 +338,7 @@ class Scheduler:
                 "action_id": action_id,
                 "description": description,
                 "timestamp": datetime.now().isoformat(),
-                "status": "executed"
+                "status": "executed",
             }
 
         self.register_callback("reminder", reminder_callback)
@@ -342,12 +348,14 @@ class Scheduler:
         """Load scheduled tasks from file."""
         if self.schedule_file.exists():
             try:
-                with open(self.schedule_file, 'r', encoding='utf-8') as f:
+                with open(self.schedule_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
 
-                for task_data in data.get('tasks', []):
+                for task_data in data.get("tasks", []):
                     # Convert schedule_type back to enum
-                    task_data['schedule_type'] = ScheduleType(task_data['schedule_type'])
+                    task_data["schedule_type"] = ScheduleType(
+                        task_data["schedule_type"]
+                    )
                     task = ScheduledTask(**task_data)
                     self.tasks[task.id] = task
             except Exception as e:
@@ -355,19 +363,16 @@ class Scheduler:
 
     def save_schedule(self):
         """Save scheduled tasks to file."""
-        data = {
-            "tasks": [],
-            "last_updated": datetime.now().isoformat()
-        }
+        data = {"tasks": [], "last_updated": datetime.now().isoformat()}
 
         for task in self.tasks.values():
             task_dict = asdict(task)
             # Convert enum to string
-            task_dict['schedule_type'] = task.schedule_type.value
+            task_dict["schedule_type"] = task.schedule_type.value
             data["tasks"].append(task_dict)
 
         try:
-            with open(self.schedule_file, 'w', encoding='utf-8') as f:
+            with open(self.schedule_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
             print(f"Error saving schedule: {e}")
@@ -375,7 +380,8 @@ class Scheduler:
     def _generate_task_id(self, base_name: str) -> str:
         """Generate a unique task ID."""
         import re
-        base_id = re.sub(r'[^a-z0-9]+', '_', base_name.lower()).strip('_')
+
+        base_id = re.sub(r"[^a-z0-9]+", "_", base_name.lower()).strip("_")
         base_id = base_id[:30]  # Limit length
 
         # Ensure uniqueness
@@ -426,5 +432,5 @@ class Scheduler:
             "completed_tasks": completed_tasks,
             "due_now": due_now,
             "upcoming_24h": upcoming_24h,
-            "last_check": now.isoformat()
+            "last_check": now.isoformat(),
         }

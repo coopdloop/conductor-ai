@@ -4,18 +4,19 @@ Maintains conversation history and context across AI interactions to provide
 continuity and learning capabilities.
 """
 
+import hashlib
 import json
 import sqlite3
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional
 from pathlib import Path
-from dataclasses import dataclass, asdict
-import hashlib
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
 class ConversationTurn:
     """A single turn in an AI conversation"""
+
     timestamp: str
     user_input: str
     ai_response: str
@@ -30,6 +31,7 @@ class ConversationTurn:
 @dataclass
 class ContextMemory:
     """Represents stored context about workflows and user patterns"""
+
     user_id: str
     context_type: str  # workflow, preference, pattern
     key: str
@@ -105,7 +107,7 @@ class ConversationMemory:
         ai_response: str,
         context_hash: str,
         actions_taken: List[Dict[str, Any]] = None,
-        metadata: Dict[str, Any] = None
+        metadata: Dict[str, Any] = None,
     ) -> int:
         """Add a conversation turn to memory"""
         actions_taken = actions_taken or []
@@ -113,27 +115,27 @@ class ConversationMemory:
 
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO conversations
                 (session_id, timestamp, user_input, ai_response, context_hash, actions_taken, metadata)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (
-                session_id,
-                datetime.now().isoformat(),
-                user_input,
-                ai_response,
-                context_hash,
-                json.dumps(actions_taken),
-                json.dumps(metadata)
-            ))
+            """,
+                (
+                    session_id,
+                    datetime.now().isoformat(),
+                    user_input,
+                    ai_response,
+                    context_hash,
+                    json.dumps(actions_taken),
+                    json.dumps(metadata),
+                ),
+            )
             conn.commit()
             return cursor.lastrowid
 
     def get_conversation_history(
-        self,
-        session_id: str,
-        limit: int = 10,
-        since: datetime = None
+        self, session_id: str, limit: int = 10, since: datetime = None
     ) -> List[ConversationTurn]:
         """Get conversation history for a session"""
         with sqlite3.connect(self.db_path) as conn:
@@ -156,15 +158,24 @@ class ConversationMemory:
 
             turns = []
             for row in cursor.fetchall():
-                timestamp, user_input, ai_response, context_hash, actions_json, metadata_json = row
-                turns.append(ConversationTurn(
-                    timestamp=timestamp,
-                    user_input=user_input,
-                    ai_response=ai_response,
-                    context_hash=context_hash,
-                    actions_taken=json.loads(actions_json) if actions_json else [],
-                    metadata=json.loads(metadata_json) if metadata_json else {}
-                ))
+                (
+                    timestamp,
+                    user_input,
+                    ai_response,
+                    context_hash,
+                    actions_json,
+                    metadata_json,
+                ) = row
+                turns.append(
+                    ConversationTurn(
+                        timestamp=timestamp,
+                        user_input=user_input,
+                        ai_response=ai_response,
+                        context_hash=context_hash,
+                        actions_taken=json.loads(actions_json) if actions_json else [],
+                        metadata=json.loads(metadata_json) if metadata_json else {},
+                    )
+                )
 
             return list(reversed(turns))  # Return chronological order
 
@@ -174,16 +185,19 @@ class ConversationMemory:
         interaction_type: str,
         key: str,
         value: Any,
-        confidence: float = 1.0
+        confidence: float = 1.0,
     ):
         """Learn and store patterns from user interactions"""
         with sqlite3.connect(self.db_path) as conn:
             # Try to update existing memory
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT usage_count, confidence FROM context_memory
                 WHERE user_id = ? AND context_type = ? AND key = ?
-            """, (user_id, interaction_type, key))
+            """,
+                (user_id, interaction_type, key),
+            )
 
             row = cursor.fetchone()
             if row:
@@ -193,42 +207,45 @@ class ConversationMemory:
                 # Weighted average of confidence scores
                 new_confidence = (old_confidence * old_count + confidence) / new_count
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     UPDATE context_memory
                     SET value = ?, confidence = ?, last_updated = ?, usage_count = ?
                     WHERE user_id = ? AND context_type = ? AND key = ?
-                """, (
-                    json.dumps(value),
-                    new_confidence,
-                    datetime.now().isoformat(),
-                    new_count,
-                    user_id,
-                    interaction_type,
-                    key
-                ))
+                """,
+                    (
+                        json.dumps(value),
+                        new_confidence,
+                        datetime.now().isoformat(),
+                        new_count,
+                        user_id,
+                        interaction_type,
+                        key,
+                    ),
+                )
             else:
                 # Insert new memory
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO context_memory
                     (user_id, context_type, key, value, confidence, last_updated, usage_count)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    user_id,
-                    interaction_type,
-                    key,
-                    json.dumps(value),
-                    confidence,
-                    datetime.now().isoformat(),
-                    1
-                ))
+                """,
+                    (
+                        user_id,
+                        interaction_type,
+                        key,
+                        json.dumps(value),
+                        confidence,
+                        datetime.now().isoformat(),
+                        1,
+                    ),
+                )
 
             conn.commit()
 
     def recall_context(
-        self,
-        user_id: str,
-        context_type: str = None,
-        min_confidence: float = 0.5
+        self, user_id: str, context_type: str = None, min_confidence: float = 0.5
     ) -> List[ContextMemory]:
         """Recall stored context for a user"""
         with sqlite3.connect(self.db_path) as conn:
@@ -250,52 +267,73 @@ class ConversationMemory:
 
             memories = []
             for row in cursor.fetchall():
-                user_id, ctx_type, key, value_json, confidence, last_updated, usage_count = row
-                memories.append(ContextMemory(
-                    user_id=user_id,
-                    context_type=ctx_type,
-                    key=key,
-                    value=json.loads(value_json),
-                    confidence=confidence,
-                    last_updated=last_updated,
-                    usage_count=usage_count
-                ))
+                (
+                    user_id,
+                    ctx_type,
+                    key,
+                    value_json,
+                    confidence,
+                    last_updated,
+                    usage_count,
+                ) = row
+                memories.append(
+                    ContextMemory(
+                        user_id=user_id,
+                        context_type=ctx_type,
+                        key=key,
+                        value=json.loads(value_json),
+                        confidence=confidence,
+                        last_updated=last_updated,
+                        usage_count=usage_count,
+                    )
+                )
 
             return memories
 
-    def get_similar_contexts(self, current_context_hash: str, limit: int = 5) -> List[ConversationTurn]:
+    def get_similar_contexts(
+        self, current_context_hash: str, limit: int = 5
+    ) -> List[ConversationTurn]:
         """Find conversations with similar context"""
         with sqlite3.connect(self.db_path) as conn:
             # For now, exact match on context hash
             # Could be enhanced with similarity algorithms
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT DISTINCT timestamp, user_input, ai_response, context_hash, actions_taken, metadata
                 FROM conversations
                 WHERE context_hash = ?
                 ORDER BY timestamp DESC
                 LIMIT ?
-            """, (current_context_hash, limit))
+            """,
+                (current_context_hash, limit),
+            )
 
             turns = []
             for row in cursor.fetchall():
-                timestamp, user_input, ai_response, context_hash, actions_json, metadata_json = row
-                turns.append(ConversationTurn(
-                    timestamp=timestamp,
-                    user_input=user_input,
-                    ai_response=ai_response,
-                    context_hash=context_hash,
-                    actions_taken=json.loads(actions_json) if actions_json else [],
-                    metadata=json.loads(metadata_json) if metadata_json else {}
-                ))
+                (
+                    timestamp,
+                    user_input,
+                    ai_response,
+                    context_hash,
+                    actions_json,
+                    metadata_json,
+                ) = row
+                turns.append(
+                    ConversationTurn(
+                        timestamp=timestamp,
+                        user_input=user_input,
+                        ai_response=ai_response,
+                        context_hash=context_hash,
+                        actions_taken=json.loads(actions_json) if actions_json else [],
+                        metadata=json.loads(metadata_json) if metadata_json else {},
+                    )
+                )
 
             return turns
 
     def suggest_actions_from_history(
-        self,
-        current_context_hash: str,
-        user_id: str,
-        limit: int = 3
+        self, current_context_hash: str, user_id: str, limit: int = 3
     ) -> List[Dict[str, Any]]:
         """Suggest actions based on historical patterns"""
         # Get similar contexts
@@ -305,30 +343,36 @@ class ConversationMemory:
         action_frequency = {}
         for turn in similar_turns:
             for action in turn.actions_taken:
-                action_type = action.get('type')
-                if action_type and action.get('success', True):
-                    action_frequency[action_type] = action_frequency.get(action_type, 0) + 1
+                action_type = action.get("type")
+                if action_type and action.get("success", True):
+                    action_frequency[action_type] = (
+                        action_frequency.get(action_type, 0) + 1
+                    )
 
         # Get user preferences
-        user_memories = self.recall_context(user_id, 'preference')
+        user_memories = self.recall_context(user_id, "preference")
         preferred_actions = set()
         for memory in user_memories:
-            if memory.key == 'preferred_actions' and memory.confidence > 0.7:
+            if memory.key == "preferred_actions" and memory.confidence > 0.7:
                 preferred_actions.update(memory.value)
 
         # Combine frequency and preferences
         suggestions = []
-        for action_type, frequency in sorted(action_frequency.items(), key=lambda x: x[1], reverse=True)[:limit]:
+        for action_type, frequency in sorted(
+            action_frequency.items(), key=lambda x: x[1], reverse=True
+        )[:limit]:
             confidence = min(frequency / len(similar_turns), 1.0)
             if action_type in preferred_actions:
                 confidence += 0.2
 
-            suggestions.append({
-                'action_type': action_type,
-                'confidence': confidence,
-                'frequency': frequency,
-                'reason': f'Used {frequency} times in similar contexts'
-            })
+            suggestions.append(
+                {
+                    "action_type": action_type,
+                    "confidence": confidence,
+                    "frequency": frequency,
+                    "reason": f"Used {frequency} times in similar contexts",
+                }
+            )
 
         return suggestions[:limit]
 
@@ -337,17 +381,23 @@ class ConversationMemory:
         cutoff = datetime.now() - timedelta(days=days)
 
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 DELETE FROM conversations
                 WHERE timestamp < ?
-            """, (cutoff.isoformat(),))
+            """,
+                (cutoff.isoformat(),),
+            )
 
             # Keep context memory longer (90 days)
             context_cutoff = datetime.now() - timedelta(days=90)
-            conn.execute("""
+            conn.execute(
+                """
                 DELETE FROM context_memory
                 WHERE last_updated < ? AND usage_count < 3
-            """, (context_cutoff.isoformat(),))
+            """,
+                (context_cutoff.isoformat(),),
+            )
 
             conn.commit()
 
@@ -356,8 +406,8 @@ class ConversationMemory:
         turns = self.get_conversation_history(session_id, limit=1000)
 
         return {
-            'session_id': session_id,
-            'export_timestamp': datetime.now().isoformat(),
-            'conversation_count': len(turns),
-            'conversations': [turn.to_dict() for turn in turns]
+            "session_id": session_id,
+            "export_timestamp": datetime.now().isoformat(),
+            "conversation_count": len(turns),
+            "conversations": [turn.to_dict() for turn in turns],
         }

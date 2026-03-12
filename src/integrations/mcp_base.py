@@ -1,8 +1,10 @@
-from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional
 import json
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional
+
 import httpx
 from config.settings import get_settings
+
 
 class MCPIntegration(ABC):
     """Base class for MCP (Model Context Protocol) integrations."""
@@ -41,17 +43,17 @@ class MCPIntegration(ABC):
     def _format_error(self, error: Exception, operation: str) -> Dict[str, Any]:
         """Format error responses consistently."""
         return {
-            'success': False,
-            'error': str(error),
-            'operation': operation,
-            'service': self.service_name
+            "success": False,
+            "error": str(error),
+            "operation": operation,
+            "service": self.service_name,
         }
 
     def _format_success(self, data: Any, operation: str) -> Dict[str, Any]:
         """Format success responses consistently."""
         return {
-            'success': True,
-            'data': data,
-            'operation': operation,
-            'service': self.service_name
+            "success": True,
+            "data": data,
+            "operation": operation,
+            "service": self.service_name,
         }

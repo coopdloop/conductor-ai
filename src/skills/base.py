@@ -4,17 +4,18 @@ Provides the foundation for AI-callable workflow skills that can be
 composed and chained together to accomplish complex tasks.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional, Callable
-from dataclasses import dataclass, asdict
-from enum import Enum
 import asyncio
 import json
+from abc import ABC, abstractmethod
+from dataclasses import asdict, dataclass
 from datetime import datetime
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 
 class SkillStatus(Enum):
     """Skill execution status"""
+
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -25,6 +26,7 @@ class SkillStatus(Enum):
 @dataclass
 class SkillExecutionResult:
     """Result of skill execution"""
+
     skill_name: str
     status: SkillStatus
     output: Dict[str, Any]
@@ -34,13 +36,14 @@ class SkillExecutionResult:
 
     def to_dict(self) -> Dict[str, Any]:
         result = asdict(self)
-        result['status'] = self.status.value
+        result["status"] = self.status.value
         return result
 
 
 @dataclass
 class SkillParameter:
     """Parameter definition for a skill"""
+
     name: str
     type: str
     description: str
@@ -50,10 +53,7 @@ class SkillParameter:
 
     def to_schema(self) -> Dict[str, Any]:
         """Convert to JSON schema format"""
-        schema = {
-            "type": self.type,
-            "description": self.description
-        }
+        schema = {"type": self.type, "description": self.description}
 
         if self.options:
             schema["enum"] = self.options
@@ -104,7 +104,7 @@ class Skill(ABC):
         self,
         context: Dict[str, Any],
         parameters: Dict[str, Any],
-        orchestrator: Any = None
+        orchestrator: Any = None,
     ) -> SkillExecutionResult:
         """Execute the skill"""
         pass
@@ -141,14 +141,16 @@ class Skill(ABC):
 
             elif param.type == "boolean" and not isinstance(value, bool):
                 if isinstance(value, str):
-                    value = value.lower() in ('true', '1', 'yes', 'on')
+                    value = value.lower() in ("true", "1", "yes", "on")
                 else:
                     errors.append(f"Parameter '{param.name}' must be a boolean")
                     continue
 
             # Check options
             if param.options and value not in param.options:
-                errors.append(f"Parameter '{param.name}' must be one of: {param.options}")
+                errors.append(
+                    f"Parameter '{param.name}' must be one of: {param.options}"
+                )
                 continue
 
             validated[param.name] = value
@@ -176,9 +178,9 @@ class Skill(ABC):
                 "parameters": {
                     "type": "object",
                     "properties": properties,
-                    "required": required
-                }
-            }
+                    "required": required,
+                },
+            },
         }
 
     async def _log_execution(self, result: SkillExecutionResult):
@@ -200,7 +202,7 @@ class CompositeSkill(Skill):
         self,
         context: Dict[str, Any],
         parameters: Dict[str, Any],
-        orchestrator: Any = None
+        orchestrator: Any = None,
     ) -> SkillExecutionResult:
         """Execute all sub-skills in sequence"""
         start_time = datetime.now()
@@ -227,7 +229,7 @@ class CompositeSkill(Skill):
                 status=SkillStatus.COMPLETED,
                 output=combined_output,
                 execution_time=execution_time,
-                metadata={"sub_skill_results": [r.to_dict() for r in results]}
+                metadata={"sub_skill_results": [r.to_dict() for r in results]},
             )
 
             await self._log_execution(result)
@@ -242,7 +244,7 @@ class CompositeSkill(Skill):
                 output=combined_output,
                 execution_time=execution_time,
                 error=str(e),
-                metadata={"sub_skill_results": [r.to_dict() for r in results]}
+                metadata={"sub_skill_results": [r.to_dict() for r in results]},
             )
 
             await self._log_execution(result)
@@ -279,20 +281,22 @@ class SkillRegistry:
             if category and skill.category != category:
                 continue
 
-            skills.append({
-                "name": skill.name,
-                "description": skill.description,
-                "category": skill.category,
-                "parameters": [
-                    {
-                        "name": p.name,
-                        "type": p.type,
-                        "description": p.description,
-                        "required": p.required
-                    }
-                    for p in skill.parameters
-                ]
-            })
+            skills.append(
+                {
+                    "name": skill.name,
+                    "description": skill.description,
+                    "category": skill.category,
+                    "parameters": [
+                        {
+                            "name": p.name,
+                            "type": p.type,
+                            "description": p.description,
+                            "required": p.required,
+                        }
+                        for p in skill.parameters
+                    ],
+                }
+            )
 
         return skills
 
@@ -309,7 +313,7 @@ class SkillRegistry:
         skill_name: str,
         context: Dict[str, Any],
         parameters: Dict[str, Any],
-        orchestrator: Any = None
+        orchestrator: Any = None,
     ) -> SkillExecutionResult:
         """Execute a skill by name"""
         skill = self.get_skill(skill_name)
@@ -319,7 +323,7 @@ class SkillRegistry:
                 status=SkillStatus.FAILED,
                 output={},
                 execution_time=0,
-                error=f"Skill '{skill_name}' not found"
+                error=f"Skill '{skill_name}' not found",
             )
 
         try:
@@ -336,15 +340,11 @@ class SkillRegistry:
                 status=SkillStatus.FAILED,
                 output={},
                 execution_time=0,
-                error=str(e)
+                error=str(e),
             )
 
     def create_composite_skill(
-        self,
-        name: str,
-        description: str,
-        category: str,
-        skill_names: List[str]
+        self, name: str, description: str, category: str, skill_names: List[str]
     ) -> Optional[CompositeSkill]:
         """Create a composite skill from existing skills"""
         skills = []

@@ -1,8 +1,10 @@
 import os
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
@@ -38,6 +40,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+
 
 def get_settings() -> Settings:
     """Get application settings instance."""

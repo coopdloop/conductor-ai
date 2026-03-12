@@ -7,24 +7,25 @@ context engineering, and AI provider interactions.
 import asyncio
 import json
 import uuid
-from datetime import datetime
-from typing import Dict, Any, List, Optional, AsyncGenerator, Union
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, AsyncGenerator, Dict, List, Optional, Union
 
+from ai.context.memory import ConversationMemory
+from ai.context.workflow_context import WorkflowContextEngine
 from ai.providers.base import AIProvider, AIResponse, WorkflowAction
 from ai.providers.claude import ClaudeProvider
 from ai.providers.openai import OpenAIProvider
-from ai.context.workflow_context import WorkflowContextEngine
-from ai.context.memory import ConversationMemory
-from core.workflow_engine import WorkflowEngine
-from core.scheduler import Scheduler
 from core.doc_processor import DocumentProcessor
 from core.mcp_manager import MCPManager
+from core.scheduler import Scheduler
+from core.workflow_engine import WorkflowEngine
 
 
 @dataclass
 class AISession:
     """Represents an active AI conversation session"""
+
     session_id: str
     provider_name: str
     user_id: str
@@ -46,7 +47,9 @@ class AIOrchestrator:
         self.mcp_manager = MCPManager()
 
         # Initialize AI components
-        self.context_engine = WorkflowContextEngine(self.workflow_engine, self.scheduler)
+        self.context_engine = WorkflowContextEngine(
+            self.workflow_engine, self.scheduler
+        )
         self.memory = ConversationMemory()
 
         # Initialize AI providers
@@ -61,23 +64,23 @@ class AIOrchestrator:
 
     def _init_providers(self):
         """Initialize AI providers based on configuration"""
-        provider_configs = self.config.get('providers', {})
+        provider_configs = self.config.get("providers", {})
 
         # Claude provider
-        if 'claude' in provider_configs or not provider_configs:
+        if "claude" in provider_configs or not provider_configs:
             try:
-                self.providers['claude'] = ClaudeProvider(
-                    provider_configs.get('claude', {})
+                self.providers["claude"] = ClaudeProvider(
+                    provider_configs.get("claude", {})
                 )
             except Exception as e:
                 # Graceful fallback
                 pass
 
         # OpenAI provider
-        if 'openai' in provider_configs:
+        if "openai" in provider_configs:
             try:
-                self.providers['openai'] = OpenAIProvider(
-                    provider_configs.get('openai', {})
+                self.providers["openai"] = OpenAIProvider(
+                    provider_configs.get("openai", {})
                 )
             except Exception as e:
                 # Graceful fallback
@@ -93,13 +96,25 @@ class AIOrchestrator:
                     "type": "object",
                     "properties": {
                         "title": {"type": "string", "description": "Workflow title"},
-                        "template": {"type": "string", "description": "Template name (optional)"},
-                        "content": {"type": "string", "description": "Custom workflow content (optional)"},
-                        "priority": {"type": "integer", "description": "Priority level 1-5"},
-                        "due_date": {"type": "string", "description": "Due date in ISO format (optional)"}
+                        "template": {
+                            "type": "string",
+                            "description": "Template name (optional)",
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Custom workflow content (optional)",
+                        },
+                        "priority": {
+                            "type": "integer",
+                            "description": "Priority level 1-5",
+                        },
+                        "due_date": {
+                            "type": "string",
+                            "description": "Due date in ISO format (optional)",
+                        },
                     },
-                    "required": ["title"]
-                }
+                    "required": ["title"],
+                },
             ),
             WorkflowAction(
                 name="update_workflow_status",
@@ -108,11 +123,23 @@ class AIOrchestrator:
                     "type": "object",
                     "properties": {
                         "workflow_id": {"type": "string", "description": "Workflow ID"},
-                        "status": {"type": "string", "enum": ["pending", "active", "in_progress", "completed", "cancelled"]},
-                        "notes": {"type": "string", "description": "Optional notes about the status change"}
+                        "status": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "active",
+                                "in_progress",
+                                "completed",
+                                "cancelled",
+                            ],
+                        },
+                        "notes": {
+                            "type": "string",
+                            "description": "Optional notes about the status change",
+                        },
                     },
-                    "required": ["workflow_id", "status"]
-                }
+                    "required": ["workflow_id", "status"],
+                },
             ),
             WorkflowAction(
                 name="update_action_status",
@@ -121,12 +148,21 @@ class AIOrchestrator:
                     "type": "object",
                     "properties": {
                         "workflow_id": {"type": "string", "description": "Workflow ID"},
-                        "action_index": {"type": "integer", "description": "Action index (0-based)"},
-                        "completed": {"type": "boolean", "description": "Whether action is completed"},
-                        "notes": {"type": "string", "description": "Notes about the action"}
+                        "action_index": {
+                            "type": "integer",
+                            "description": "Action index (0-based)",
+                        },
+                        "completed": {
+                            "type": "boolean",
+                            "description": "Whether action is completed",
+                        },
+                        "notes": {
+                            "type": "string",
+                            "description": "Notes about the action",
+                        },
                     },
-                    "required": ["workflow_id", "action_index"]
-                }
+                    "required": ["workflow_id", "action_index"],
+                },
             ),
             WorkflowAction(
                 name="schedule_reminder",
@@ -134,13 +170,25 @@ class AIOrchestrator:
                 parameters={
                     "type": "object",
                     "properties": {
-                        "message": {"type": "string", "description": "Reminder message"},
-                        "scheduled_for": {"type": "string", "description": "When to remind (e.g., 'tomorrow 2pm', '2024-01-15T14:00:00')"},
-                        "recurring": {"type": "boolean", "description": "Whether this is a recurring reminder"},
-                        "workflow_id": {"type": "string", "description": "Associated workflow ID (optional)"}
+                        "message": {
+                            "type": "string",
+                            "description": "Reminder message",
+                        },
+                        "scheduled_for": {
+                            "type": "string",
+                            "description": "When to remind (e.g., 'tomorrow 2pm', '2024-01-15T14:00:00')",
+                        },
+                        "recurring": {
+                            "type": "boolean",
+                            "description": "Whether this is a recurring reminder",
+                        },
+                        "workflow_id": {
+                            "type": "string",
+                            "description": "Associated workflow ID (optional)",
+                        },
                     },
-                    "required": ["message", "scheduled_for"]
-                }
+                    "required": ["message", "scheduled_for"],
+                },
             ),
             WorkflowAction(
                 name="create_document",
@@ -149,12 +197,22 @@ class AIOrchestrator:
                     "type": "object",
                     "properties": {
                         "title": {"type": "string", "description": "Document title"},
-                        "content": {"type": "string", "description": "Document content in markdown"},
-                        "format": {"type": "string", "enum": ["html", "docx"], "description": "Output format"},
-                        "workflow_id": {"type": "string", "description": "Associated workflow ID (optional)"}
+                        "content": {
+                            "type": "string",
+                            "description": "Document content in markdown",
+                        },
+                        "format": {
+                            "type": "string",
+                            "enum": ["html", "docx"],
+                            "description": "Output format",
+                        },
+                        "workflow_id": {
+                            "type": "string",
+                            "description": "Associated workflow ID (optional)",
+                        },
                     },
-                    "required": ["title", "content"]
-                }
+                    "required": ["title", "content"],
+                },
             ),
             WorkflowAction(
                 name="publish_to_service",
@@ -162,19 +220,26 @@ class AIOrchestrator:
                 parameters={
                     "type": "object",
                     "properties": {
-                        "service": {"type": "string", "enum": ["jira", "confluence", "github", "slack"]},
-                        "action": {"type": "string", "description": "Service-specific action (e.g., 'update_issue', 'publish_page')"},
-                        "parameters": {"type": "object", "description": "Service-specific parameters"}
+                        "service": {
+                            "type": "string",
+                            "enum": ["jira", "confluence", "github", "slack"],
+                        },
+                        "action": {
+                            "type": "string",
+                            "description": "Service-specific action (e.g., 'update_issue', 'publish_page')",
+                        },
+                        "parameters": {
+                            "type": "object",
+                            "description": "Service-specific parameters",
+                        },
                     },
-                    "required": ["service", "action", "parameters"]
-                }
-            )
+                    "required": ["service", "action", "parameters"],
+                },
+            ),
         ]
 
     async def start_conversation(
-        self,
-        user_id: str = "default",
-        provider: str = "claude"
+        self, user_id: str = "default", provider: str = "claude"
     ) -> str:
         """Start a new AI conversation session"""
         if provider not in self.providers:
@@ -182,7 +247,9 @@ class AIOrchestrator:
             if available:
                 provider = available[0]  # Use first available provider
             else:
-                raise ValueError("No AI providers available. Please configure at least one provider.")
+                raise ValueError(
+                    "No AI providers available. Please configure at least one provider."
+                )
 
         session_id = str(uuid.uuid4())
         session = AISession(
@@ -190,17 +257,14 @@ class AIOrchestrator:
             provider_name=provider,
             user_id=user_id,
             created_at=datetime.now().isoformat(),
-            last_activity=datetime.now().isoformat()
+            last_activity=datetime.now().isoformat(),
         )
 
         self.active_sessions[session_id] = session
         return session_id
 
     async def chat(
-        self,
-        session_id: str,
-        user_input: str,
-        stream: bool = False
+        self, session_id: str, user_input: str, stream: bool = False
     ) -> Union[AsyncGenerator[str, None], AIResponse]:
         """Engage in conversation with AI"""
         if session_id not in self.active_sessions:
@@ -236,7 +300,13 @@ class AIOrchestrator:
         try:
             if stream:
                 return self._stream_conversation(
-                    provider, messages, tools, system_prompt, session, context_snapshot, user_input
+                    provider,
+                    messages,
+                    tools,
+                    system_prompt,
+                    session,
+                    context_snapshot,
+                    user_input,
                 )
             else:
                 response = await provider.generate(messages, tools, system_prompt)
@@ -251,8 +321,12 @@ class AIOrchestrator:
                     user_input,
                     response.content,
                     context_snapshot.context_hash,
-                    actions_taken=[call for call in response.function_calls] if response.function_calls else [],
-                    metadata={"provider": session.provider_name}
+                    actions_taken=(
+                        [call for call in response.function_calls]
+                        if response.function_calls
+                        else []
+                    ),
+                    metadata={"provider": session.provider_name},
                 )
 
                 # Update session
@@ -268,7 +342,7 @@ class AIOrchestrator:
             # Return error response
             error_response = AIResponse(
                 content=f"I encountered an error: {str(e)}. Please try again or check your configuration.",
-                metadata={"error": True, "provider": session.provider_name}
+                metadata={"error": True, "provider": session.provider_name},
             )
             return error_response
 
@@ -280,7 +354,7 @@ class AIOrchestrator:
         system_prompt: str,
         session: AISession,
         context_snapshot,
-        user_input: str
+        user_input: str,
     ) -> AsyncGenerator[str, None]:
         """Stream conversation response"""
         full_response = ""
@@ -294,7 +368,7 @@ class AIOrchestrator:
             user_input,
             full_response,
             context_snapshot.context_hash,
-            metadata={"provider": session.provider_name, "streamed": True}
+            metadata={"provider": session.provider_name, "streamed": True},
         )
 
     def _build_system_prompt(self, ai_context: Dict[str, Any], user_id: str) -> str:
@@ -316,17 +390,19 @@ class AIOrchestrator:
             "- Use available tools to take concrete actions when requested",
             "- Provide clear, actionable recommendations",
             "",
-            "Current Workflow Context:"
+            "Current Workflow Context:",
         ]
 
         # Add current context
         if ai_context.get("current_workflow"):
             workflow = ai_context["current_workflow"]
-            prompt_parts.extend([
-                f"Active Workflow: {workflow.get('title', 'Untitled')}",
-                f"Status: {workflow.get('status', 'unknown')}",
-                f"Priority: {workflow.get('priority', 'medium')}"
-            ])
+            prompt_parts.extend(
+                [
+                    f"Active Workflow: {workflow.get('title', 'Untitled')}",
+                    f"Status: {workflow.get('status', 'unknown')}",
+                    f"Priority: {workflow.get('priority', 'medium')}",
+                ]
+            )
 
         if ai_context.get("user_focus"):
             prompt_parts.append(f"Current Focus: {ai_context['user_focus']}")
@@ -347,7 +423,9 @@ class AIOrchestrator:
 
         return "\n".join(prompt_parts)
 
-    async def _execute_function_calls(self, response: AIResponse, session: AISession) -> AIResponse:
+    async def _execute_function_calls(
+        self, response: AIResponse, session: AISession
+    ) -> AIResponse:
         """Execute AI-requested function calls"""
         if not response.function_calls:
             return response
@@ -359,19 +437,21 @@ class AIOrchestrator:
                 result = await self._execute_single_function(call, session)
                 execution_results.append(result)
             except Exception as e:
-                execution_results.append({
-                    "function": call["name"],
-                    "success": False,
-                    "error": str(e)
-                })
+                execution_results.append(
+                    {"function": call["name"], "success": False, "error": str(e)}
+                )
 
         # Update response with execution results
         if execution_results:
-            response.content += "\n\n" + self._format_execution_results(execution_results)
+            response.content += "\n\n" + self._format_execution_results(
+                execution_results
+            )
 
         return response
 
-    async def _execute_single_function(self, call: Dict[str, Any], session: AISession) -> Dict[str, Any]:
+    async def _execute_single_function(
+        self, call: Dict[str, Any], session: AISession
+    ) -> Dict[str, Any]:
         """Execute a single function call"""
         function_name = call["name"]
         arguments = call.get("arguments", {})
@@ -382,15 +462,17 @@ class AIOrchestrator:
                 template=arguments.get("template"),
                 content=arguments.get("content"),
                 priority=arguments.get("priority", 3),
-                due_date=arguments.get("due_date")
+                due_date=arguments.get("due_date"),
             )
-            return {"function": "create_workflow", "success": True, "workflow_id": result["workflow_id"]}
+            return {
+                "function": "create_workflow",
+                "success": True,
+                "workflow_id": result["workflow_id"],
+            }
 
         elif function_name == "update_workflow_status":
             self.workflow_engine.update_workflow_status(
-                arguments["workflow_id"],
-                arguments["status"],
-                arguments.get("notes")
+                arguments["workflow_id"], arguments["status"], arguments.get("notes")
             )
             return {"function": "update_workflow_status", "success": True}
 
@@ -399,7 +481,7 @@ class AIOrchestrator:
                 arguments["workflow_id"],
                 arguments["action_index"],
                 completed=arguments.get("completed"),
-                notes=arguments.get("notes")
+                notes=arguments.get("notes"),
             )
             return {"function": "update_action_status", "success": True}
 
@@ -408,26 +490,35 @@ class AIOrchestrator:
                 arguments["message"],
                 arguments["scheduled_for"],
                 recurring=arguments.get("recurring", False),
-                metadata={"workflow_id": arguments.get("workflow_id")}
+                metadata={"workflow_id": arguments.get("workflow_id")},
             )
-            return {"function": "schedule_reminder", "success": True, "reminder_id": reminder_id}
+            return {
+                "function": "schedule_reminder",
+                "success": True,
+                "reminder_id": reminder_id,
+            }
 
         elif function_name == "create_document":
             result = self.doc_processor.create_document(
                 title=arguments["title"],
                 content=arguments["content"],
                 format=arguments.get("format", "html"),
-                metadata={"workflow_id": arguments.get("workflow_id")}
+                metadata={"workflow_id": arguments.get("workflow_id")},
             )
-            return {"function": "create_document", "success": True, "doc_id": result["doc_id"]}
+            return {
+                "function": "create_document",
+                "success": True,
+                "doc_id": result["doc_id"],
+            }
 
         elif function_name == "publish_to_service":
             result = self.mcp_manager.execute_service_action(
-                arguments["service"],
-                arguments["action"],
-                arguments["parameters"]
+                arguments["service"], arguments["action"], arguments["parameters"]
             )
-            return {"function": "publish_to_service", "success": result.get("success", False)}
+            return {
+                "function": "publish_to_service",
+                "success": result.get("success", False),
+            }
 
         else:
             raise ValueError(f"Unknown function: {function_name}")
@@ -442,11 +533,15 @@ class AIOrchestrator:
             if result["success"]:
                 formatted.append(f"✅ {result['function']}: Completed successfully")
             else:
-                formatted.append(f"❌ {result['function']}: {result.get('error', 'Failed')}")
+                formatted.append(
+                    f"❌ {result['function']}: {result.get('error', 'Failed')}"
+                )
 
         return "\n".join(formatted)
 
-    def _learn_from_interaction(self, user_id: str, user_input: str, response: AIResponse):
+    def _learn_from_interaction(
+        self, user_id: str, user_input: str, response: AIResponse
+    ):
         """Learn patterns from user interactions"""
         # Learn preferred actions
         if response.function_calls:
@@ -456,7 +551,7 @@ class AIOrchestrator:
                 "preference",
                 "preferred_actions",
                 preferred_actions,
-                confidence=0.8
+                confidence=0.8,
             )
 
         # Learn conversation patterns
@@ -467,7 +562,7 @@ class AIOrchestrator:
                 "pattern",
                 "urgency_keywords",
                 ["urgent", "asap", "immediately"],
-                confidence=0.9
+                confidence=0.9,
             )
 
     def get_session_info(self, session_id: str) -> Dict[str, Any]:
@@ -482,16 +577,18 @@ class AIOrchestrator:
             "user_id": session.user_id,
             "created_at": session.created_at,
             "last_activity": session.last_activity,
-            "conversation_count": len(self.memory.get_conversation_history(session_id))
+            "conversation_count": len(self.memory.get_conversation_history(session_id)),
         }
 
     def list_available_providers(self) -> List[Dict[str, Any]]:
         """List available AI providers"""
         providers = []
         for name, provider in self.providers.items():
-            providers.append({
-                "name": name,
-                "model": provider.model,
-                "capabilities": [cap.value for cap in provider.capabilities]
-            })
+            providers.append(
+                {
+                    "name": name,
+                    "model": provider.model,
+                    "capabilities": [cap.value for cap in provider.capabilities],
+                }
+            )
         return providers

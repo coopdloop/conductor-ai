@@ -1,11 +1,12 @@
 """OpenAI Provider for GPT models"""
 
-import os
 import json
-from typing import Dict, Any, List, Optional, AsyncGenerator
+import os
+from typing import Any, AsyncGenerator, Dict, List, Optional
+
 import aiohttp
 
-from ai.providers.base import AIProvider, AIResponse, AIProviderError, AICapability
+from ai.providers.base import AICapability, AIProvider, AIProviderError, AIResponse
 
 
 class OpenAIProvider(AIProvider):
@@ -18,13 +19,15 @@ class OpenAIProvider(AIProvider):
             "max_tokens": 4096,
             "temperature": 0.1,
             "api_key": os.getenv("OPENAI_API_KEY"),
-            "base_url": "https://api.openai.com/v1"
+            "base_url": "https://api.openai.com/v1",
         }
         default_config.update(config)
         super().__init__(default_config)
 
         if not self.config.get("api_key"):
-            raise AIProviderError("OpenAI API key not provided. Set OPENAI_API_KEY environment variable.")
+            raise AIProviderError(
+                "OpenAI API key not provided. Set OPENAI_API_KEY environment variable."
+            )
 
     @property
     def name(self) -> str:
@@ -39,7 +42,7 @@ class OpenAIProvider(AIProvider):
             AICapability.TEXT_GENERATION,
             AICapability.FUNCTION_CALLING,
             AICapability.STRUCTURED_OUTPUT,
-            AICapability.STREAMING
+            AICapability.STREAMING,
         ]
 
     async def generate(
@@ -47,13 +50,13 @@ class OpenAIProvider(AIProvider):
         messages: List[Dict[str, str]],
         tools: Optional[List[Dict[str, Any]]] = None,
         system_prompt: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> AIResponse:
         """Generate response using OpenAI API"""
         try:
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.config['api_key']}"
+                "Authorization": f"Bearer {self.config['api_key']}",
             }
 
             # Prepare messages with system prompt if provided
@@ -72,7 +75,7 @@ class OpenAIProvider(AIProvider):
                 "model": self.model,
                 "messages": formatted_messages,
                 "max_tokens": kwargs.get("max_tokens", self.config["max_tokens"]),
-                "temperature": kwargs.get("temperature", self.config["temperature"])
+                "temperature": kwargs.get("temperature", self.config["temperature"]),
             }
 
             if tools and self.supports_capability(AICapability.FUNCTION_CALLING):
@@ -83,7 +86,7 @@ class OpenAIProvider(AIProvider):
                 async with session.post(
                     f"{self.config['base_url']}/chat/completions",
                     headers=headers,
-                    json=request_data
+                    json=request_data,
                 ) as response:
                     if response.status != 200:
                         error_text = await response.text()
@@ -92,7 +95,9 @@ class OpenAIProvider(AIProvider):
                     result = await response.json()
 
                     if "error" in result:
-                        raise AIProviderError(f"OpenAI API error: {result['error']['message']}")
+                        raise AIProviderError(
+                            f"OpenAI API error: {result['error']['message']}"
+                        )
 
                     choice = result["choices"][0]
                     message = choice["message"]
@@ -103,17 +108,21 @@ class OpenAIProvider(AIProvider):
                     # Handle function calls
                     if "tool_calls" in message:
                         for tool_call in message["tool_calls"]:
-                            function_calls.append({
-                                "name": tool_call["function"]["name"],
-                                "arguments": json.loads(tool_call["function"]["arguments"]),
-                                "id": tool_call["id"]
-                            })
+                            function_calls.append(
+                                {
+                                    "name": tool_call["function"]["name"],
+                                    "arguments": json.loads(
+                                        tool_call["function"]["arguments"]
+                                    ),
+                                    "id": tool_call["id"],
+                                }
+                            )
 
                     return AIResponse(
                         content=content,
                         usage=result.get("usage", {}),
                         function_calls=function_calls,
-                        metadata={"model": self.model, "provider": "openai"}
+                        metadata={"model": self.model, "provider": "openai"},
                     )
 
         except aiohttp.ClientError as e:
@@ -126,13 +135,13 @@ class OpenAIProvider(AIProvider):
         messages: List[Dict[str, str]],
         tools: Optional[List[Dict[str, Any]]] = None,
         system_prompt: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> AsyncGenerator[str, None]:
         """Stream response using OpenAI API"""
         try:
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.config['api_key']}"
+                "Authorization": f"Bearer {self.config['api_key']}",
             }
 
             # Prepare messages
@@ -150,7 +159,7 @@ class OpenAIProvider(AIProvider):
                 "messages": formatted_messages,
                 "max_tokens": kwargs.get("max_tokens", self.config["max_tokens"]),
                 "temperature": kwargs.get("temperature", self.config["temperature"]),
-                "stream": True
+                "stream": True,
             }
 
             if tools and self.supports_capability(AICapability.FUNCTION_CALLING):
@@ -160,17 +169,17 @@ class OpenAIProvider(AIProvider):
                 async with session.post(
                     f"{self.config['base_url']}/chat/completions",
                     headers=headers,
-                    json=request_data
+                    json=request_data,
                 ) as response:
                     if response.status != 200:
                         error_text = await response.text()
                         raise AIProviderError(f"OpenAI API error: {error_text}")
 
                     async for line in response.content:
-                        line = line.decode('utf-8').strip()
-                        if line.startswith('data: '):
+                        line = line.decode("utf-8").strip()
+                        if line.startswith("data: "):
                             data = line[6:]
-                            if data == '[DONE]':
+                            if data == "[DONE]":
                                 break
                             try:
                                 chunk = json.loads(data)
@@ -192,28 +201,38 @@ class OpenAIProvider(AIProvider):
 
         if "current_workflow" in context:
             workflow = context["current_workflow"]
-            formatted.append(f"\n## Current Workflow: {workflow.get('title', 'Untitled')}")
+            formatted.append(
+                f"\n## Current Workflow: {workflow.get('title', 'Untitled')}"
+            )
             formatted.append(f"Status: {workflow.get('status', 'unknown')}")
             formatted.append(f"Priority: {workflow.get('priority', 'medium')}")
 
             if "actions" in workflow:
-                completed = sum(1 for action in workflow["actions"] if action.get("completed"))
+                completed = sum(
+                    1 for action in workflow["actions"] if action.get("completed")
+                )
                 total = len(workflow["actions"])
                 formatted.append(f"Progress: {completed}/{total} actions completed")
 
                 formatted.append("\n### Actions:")
                 for i, action in enumerate(workflow["actions"], 1):
                     status = "✓" if action.get("completed") else "○"
-                    formatted.append(f"{status} {i}. {action.get('description', 'No description')}")
+                    formatted.append(
+                        f"{status} {i}. {action.get('description', 'No description')}"
+                    )
 
         if "schedule" in context and context["schedule"]:
             formatted.append("\n## Today's Schedule:")
             for item in context["schedule"]:
-                formatted.append(f"• {item.get('time', 'No time')}: {item.get('description', 'No description')}")
+                formatted.append(
+                    f"• {item.get('time', 'No time')}: {item.get('description', 'No description')}"
+                )
 
         if "related_workflows" in context and context["related_workflows"]:
             formatted.append("\n## Related Workflows:")
             for workflow in context["related_workflows"]:
-                formatted.append(f"• {workflow.get('title', 'Untitled')} ({workflow.get('status', 'unknown')})")
+                formatted.append(
+                    f"• {workflow.get('title', 'Untitled')} ({workflow.get('status', 'unknown')})"
+                )
 
         return "\n".join(formatted)

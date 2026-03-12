@@ -3,15 +3,16 @@
 Defines the contract that all AI providers must implement to work with Conductor.
 """
 
+import json
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional, AsyncGenerator
 from dataclasses import dataclass
 from enum import Enum
-import json
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 
 class AICapability(Enum):
     """AI provider capabilities"""
+
     TEXT_GENERATION = "text_generation"
     FUNCTION_CALLING = "function_calling"
     STRUCTURED_OUTPUT = "structured_output"
@@ -22,6 +23,7 @@ class AICapability(Enum):
 @dataclass
 class AIResponse:
     """Response from AI provider"""
+
     content: str
     usage: Dict[str, int] = None
     function_calls: List[Dict[str, Any]] = None
@@ -33,12 +35,13 @@ class AIResponse:
             "content": self.content,
             "usage": self.usage or {},
             "function_calls": self.function_calls or [],
-            "metadata": self.metadata or {}
+            "metadata": self.metadata or {},
         }
 
 
 class AIProviderError(Exception):
     """Base exception for AI provider errors"""
+
     pass
 
 
@@ -77,7 +80,7 @@ class AIProvider(ABC):
         messages: List[Dict[str, str]],
         tools: Optional[List[Dict[str, Any]]] = None,
         system_prompt: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> AIResponse:
         """Generate response from messages"""
         pass
@@ -88,7 +91,7 @@ class AIProvider(ABC):
         messages: List[Dict[str, str]],
         tools: Optional[List[Dict[str, Any]]] = None,
         system_prompt: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> AsyncGenerator[str, None]:
         """Stream response from messages"""
         pass
@@ -96,21 +99,17 @@ class AIProvider(ABC):
     async def test_connection(self) -> Dict[str, Any]:
         """Test provider connection"""
         try:
-            response = await self.generate([
-                {"role": "user", "content": "Test connection"}
-            ])
+            response = await self.generate(
+                [{"role": "user", "content": "Test connection"}]
+            )
             return {
                 "success": True,
                 "provider": self.name,
                 "model": self.model,
-                "capabilities": [cap.value for cap in self.capabilities]
+                "capabilities": [cap.value for cap in self.capabilities],
             }
         except Exception as e:
-            return {
-                "success": False,
-                "provider": self.name,
-                "error": str(e)
-            }
+            return {"success": False, "provider": self.name, "error": str(e)}
 
     def supports_capability(self, capability: AICapability) -> bool:
         """Check if provider supports capability"""
@@ -123,7 +122,9 @@ class AIProvider(ABC):
 
         if "current_workflow" in context:
             workflow = context["current_workflow"]
-            formatted.append(f"## Current Workflow: {workflow.get('title', 'Untitled')}")
+            formatted.append(
+                f"## Current Workflow: {workflow.get('title', 'Untitled')}"
+            )
             formatted.append(f"Status: {workflow.get('status', 'unknown')}")
             formatted.append(f"Priority: {workflow.get('priority', 'medium')}")
 
@@ -131,17 +132,23 @@ class AIProvider(ABC):
                 formatted.append("### Actions:")
                 for i, action in enumerate(workflow["actions"], 1):
                     status = "✅" if action.get("completed") else "⏳"
-                    formatted.append(f"{i}. {status} {action.get('description', 'No description')}")
+                    formatted.append(
+                        f"{i}. {status} {action.get('description', 'No description')}"
+                    )
 
         if "related_workflows" in context:
             formatted.append("### Related Workflows:")
             for workflow in context["related_workflows"]:
-                formatted.append(f"- {workflow.get('title', 'Untitled')} ({workflow.get('status', 'unknown')})")
+                formatted.append(
+                    f"- {workflow.get('title', 'Untitled')} ({workflow.get('status', 'unknown')})"
+                )
 
         if "schedule" in context:
             formatted.append("### Today's Schedule:")
             for item in context["schedule"]:
-                formatted.append(f"- {item.get('time', 'No time')}: {item.get('description', 'No description')}")
+                formatted.append(
+                    f"- {item.get('time', 'No time')}: {item.get('description', 'No description')}"
+                )
 
         return "\n".join(formatted)
 
@@ -161,6 +168,6 @@ class WorkflowAction:
             "function": {
                 "name": self.name,
                 "description": self.description,
-                "parameters": self.parameters
-            }
+                "parameters": self.parameters,
+            },
         }

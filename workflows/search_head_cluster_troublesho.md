@@ -88,4 +88,3 @@ Systematic review and updating of project documentation
 - [ ] Publish to Confluence with versioning
 - [ ] Notify stakeholders of changes
 - [ ] Archive outdated versions
-

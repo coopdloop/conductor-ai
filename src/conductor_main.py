@@ -15,6 +15,7 @@ try:
     conductor_script = conductor_dir / "conductor.py"
     if conductor_script.exists():
         import importlib.util
+
         spec = importlib.util.spec_from_file_location("conductor", conductor_script)
         conductor_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(conductor_module)

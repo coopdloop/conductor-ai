@@ -1,12 +1,12 @@
-import json
 import importlib
 import importlib.util
+import json
 from abc import ABC, abstractmethod
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List, Optional, Type
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Type
 
 
 class ServiceStatus(Enum):
@@ -20,6 +20,7 @@ class ServiceStatus(Enum):
 @dataclass
 class ServiceCapability:
     """Represents a capability that an MCP service provides."""
+
     name: str
     description: str
     parameters: List[str]
@@ -29,6 +30,7 @@ class ServiceCapability:
 @dataclass
 class ServiceInfo:
     """Information about an MCP service."""
+
     name: str
     description: str
     status: ServiceStatus
@@ -78,7 +80,11 @@ class MCPService(ABC):
         self.config.update(config)
 
         # Check if all required config is present
-        missing_keys = [key for key in self.required_config if key not in self.config or not self.config[key]]
+        missing_keys = [
+            key
+            for key in self.required_config
+            if key not in self.config or not self.config[key]
+        ]
         if missing_keys:
             self._status = ServiceStatus.ERROR
             return False
@@ -103,7 +109,7 @@ class MCPService(ABC):
             description=self.service_description,
             status=self.status,
             capabilities=self.capabilities,
-            config_keys=self.required_config
+            config_keys=self.required_config,
         )
 
 
@@ -111,7 +117,9 @@ class MCPManager:
     """Manages all MCP services and their capabilities."""
 
     def __init__(self, services_dir: Path = None):
-        self.services_dir = services_dir or Path(__file__).parent.parent / 'integrations'
+        self.services_dir = (
+            services_dir or Path(__file__).parent.parent / "integrations"
+        )
         self.services: Dict[str, MCPService] = {}
         self.service_classes: Dict[str, Type[MCPService]] = {}
 
@@ -123,8 +131,8 @@ class MCPManager:
             return
 
         # Look for service files
-        for service_file in self.services_dir.glob('*_integration.py'):
-            if service_file.name == 'mcp_base.py':
+        for service_file in self.services_dir.glob("*_integration.py"):
+            if service_file.name == "mcp_base.py":
                 continue
 
             try:
@@ -137,11 +145,17 @@ class MCPManager:
                 # Look for MCP service classes
                 for attr_name in dir(module):
                     attr = getattr(module, attr_name)
-                    if (isinstance(attr, type) and
-                        issubclass(attr, MCPService) and
-                        attr != MCPService):
+                    if (
+                        isinstance(attr, type)
+                        and issubclass(attr, MCPService)
+                        and attr != MCPService
+                    ):
 
-                        service_name = attr_name.lower().replace('integration', '').replace('service', '')
+                        service_name = (
+                            attr_name.lower()
+                            .replace("integration", "")
+                            .replace("service", "")
+                        )
                         self.service_classes[service_name] = attr
 
             except Exception as e:
@@ -159,17 +173,21 @@ class MCPManager:
                 temp_service = service_class()
                 services_info.append(temp_service.get_info())
             except Exception as e:
-                services_info.append(ServiceInfo(
-                    name=service_name,
-                    description=f"Error loading service: {e}",
-                    status=ServiceStatus.ERROR,
-                    capabilities=[],
-                    config_keys=[]
-                ))
+                services_info.append(
+                    ServiceInfo(
+                        name=service_name,
+                        description=f"Error loading service: {e}",
+                        status=ServiceStatus.ERROR,
+                        capabilities=[],
+                        config_keys=[],
+                    )
+                )
 
         return services_info
 
-    def configure_service(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    def configure_service(
+        self, service_name: str, config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Configure a specific service."""
         if service_name not in self.service_classes:
             return {"success": False, "error": f"Service {service_name} not found"}
@@ -189,7 +207,11 @@ class MCPManager:
             if success:
                 return {"success": True, "status": service.status.value}
             else:
-                return {"success": False, "error": "Configuration failed", "status": service.status.value}
+                return {
+                    "success": False,
+                    "error": "Configuration failed",
+                    "status": service.status.value,
+                }
 
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -212,15 +234,23 @@ class MCPManager:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def execute_service_action(self, service_name: str, action: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    def execute_service_action(
+        self, service_name: str, action: str, parameters: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Execute an action on a specific service."""
         if service_name not in self.services:
             return {"success": False, "error": f"Service {service_name} not configured"}
 
         try:
             service = self.services[service_name]
-            if service.status not in [ServiceStatus.CONFIGURED, ServiceStatus.CONNECTED]:
-                return {"success": False, "error": f"Service {service_name} not ready (status: {service.status.value})"}
+            if service.status not in [
+                ServiceStatus.CONFIGURED,
+                ServiceStatus.CONNECTED,
+            ]:
+                return {
+                    "success": False,
+                    "error": f"Service {service_name} not ready (status: {service.status.value})",
+                }
 
             result = service.execute_action(action, parameters)
             return result
@@ -246,25 +276,18 @@ class MCPManager:
 
         # Common environment variable patterns
         env_mappings = {
-            'jira': {
-                'server_url': 'JIRA_SERVER_URL',
-                'username': 'JIRA_USERNAME',
-                'api_token': 'JIRA_API_TOKEN'
+            "jira": {
+                "server_url": "JIRA_SERVER_URL",
+                "username": "JIRA_USERNAME",
+                "api_token": "JIRA_API_TOKEN",
             },
-            'confluence': {
-                'server_url': 'CONFLUENCE_SERVER_URL',
-                'api_token': 'CONFLUENCE_API_TOKEN'
+            "confluence": {
+                "server_url": "CONFLUENCE_SERVER_URL",
+                "api_token": "CONFLUENCE_API_TOKEN",
             },
-            'github': {
-                'token': 'GITHUB_TOKEN'
-            },
-            'slack': {
-                'token': 'SLACK_BOT_TOKEN',
-                'webhook_url': 'SLACK_WEBHOOK_URL'
-            },
-            'webex': {
-                'token': 'WEBEX_BOT_TOKEN'
-            }
+            "github": {"token": "GITHUB_TOKEN"},
+            "slack": {"token": "SLACK_BOT_TOKEN", "webhook_url": "SLACK_WEBHOOK_URL"},
+            "webex": {"token": "WEBEX_BOT_TOKEN"},
         }
 
         for service_name, env_keys in env_mappings.items():
@@ -290,7 +313,7 @@ class MCPManager:
                 "status": service.status.value,
                 "configured": service.status != ServiceStatus.AVAILABLE,
                 "connected": service.status == ServiceStatus.CONNECTED,
-                "capabilities_count": len(service.capabilities)
+                "capabilities_count": len(service.capabilities),
             }
 
         # Include available but not configured services
@@ -301,7 +324,7 @@ class MCPManager:
                     "status": ServiceStatus.AVAILABLE.value,
                     "configured": False,
                     "connected": False,
-                    "capabilities_count": 0
+                    "capabilities_count": 0,
                 }
 
         return status
@@ -318,17 +341,19 @@ class MCPManager:
 
         return matching_services
 
-    def execute_workflow_action(self, action_type: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    def execute_workflow_action(
+        self, action_type: str, parameters: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Execute a workflow action using appropriate MCP service."""
 
         # Map action types to service capabilities
         action_mappings = {
-            'jira_update': ('jira', 'update_issue'),
-            'jira_comment': ('jira', 'add_comment'),
-            'confluence_publish': ('confluence', 'publish_page'),
-            'github_commit': ('github', 'create_commit'),
-            'slack_message': ('slack', 'send_message'),
-            'webex_message': ('webex', 'send_message'),
+            "jira_update": ("jira", "update_issue"),
+            "jira_comment": ("jira", "add_comment"),
+            "confluence_publish": ("confluence", "publish_page"),
+            "github_commit": ("github", "create_commit"),
+            "slack_message": ("slack", "send_message"),
+            "webex_message": ("webex", "send_message"),
         }
 
         if action_type not in action_mappings:
@@ -341,7 +366,9 @@ class MCPManager:
 
         return self.execute_service_action(service_name, action, parameters)
 
-    def bulk_configure_services(self, configs: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    def bulk_configure_services(
+        self, configs: Dict[str, Dict[str, Any]]
+    ) -> Dict[str, Dict[str, Any]]:
         """Configure multiple services at once."""
         results = {}
 
@@ -354,7 +381,7 @@ class MCPManager:
         """Export current service configurations (excluding sensitive data)."""
         export_data = {
             "configured_services": [],
-            "export_timestamp": datetime.now().isoformat()
+            "export_timestamp": datetime.now().isoformat(),
         }
 
         for service_name, service in self.services.items():
@@ -362,7 +389,7 @@ class MCPManager:
                 "name": service_name,
                 "status": service.status.value,
                 "config_keys": list(service.config.keys()),
-                "capabilities": [cap.name for cap in service.capabilities]
+                "capabilities": [cap.name for cap in service.capabilities],
             }
             export_data["configured_services"].append(service_data)
 
@@ -370,6 +397,7 @@ class MCPManager:
 
 
 # Enhanced service base classes for specific types
+
 
 class ChatService(MCPService):
     """Base class for chat/messaging services."""
@@ -403,7 +431,9 @@ class DocumentationService(MCPService):
     """Base class for documentation services."""
 
     @abstractmethod
-    def publish_page(self, title: str, content: str, space: str = None) -> Dict[str, Any]:
+    def publish_page(
+        self, title: str, content: str, space: str = None
+    ) -> Dict[str, Any]:
         """Publish a documentation page."""
         pass
 
@@ -417,11 +447,20 @@ class RepositoryService(MCPService):
     """Base class for code repository services."""
 
     @abstractmethod
-    def create_commit(self, repo: str, file_path: str, content: str, message: str) -> Dict[str, Any]:
+    def create_commit(
+        self, repo: str, file_path: str, content: str, message: str
+    ) -> Dict[str, Any]:
         """Create a commit in a repository."""
         pass
 
     @abstractmethod
-    def create_pull_request(self, repo: str, title: str, description: str, source_branch: str, target_branch: str) -> Dict[str, Any]:
+    def create_pull_request(
+        self,
+        repo: str,
+        title: str,
+        description: str,
+        source_branch: str,
+        target_branch: str,
+    ) -> Dict[str, Any]:
         """Create a pull request."""
         pass

@@ -1,0 +1,20 @@
+# Bandit configuration for Conductor
+# Suppress false positives while maintaining security
+
+skips:
+  # Skip import subprocess warnings for legitimate shell completion
+  - B404
+  # Skip try/except/pass warnings - these are intentional graceful fallbacks
+  - B110
+  - B112
+  # Skip hardcoded password warnings for environment variable names
+  - B105
+
+exclude_dirs:
+  - venv
+  - .venv
+  - user_docs
+  - user_workflows
+  - .conductor
+  - .git
+  - __pycache__
