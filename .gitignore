@@ -1,0 +1,189 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.env.local
+.env.production
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDEs and Editors
+.vscode/
+.idea/
+.cursor/
+.cursorrules
+*.swp
+*.swo
+*~
+
+# AI and Machine Learning
+*.model
+*.weights
+*.h5
+*.pkl
+*.joblib
+models/
+checkpoints/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Output directories
+output/
+logs/
+workflow_templates/*.json
+temp/
+
+# Generated documentation
+docs/_build/
+docs/build/
+
+# API keys and secrets
+secrets.env
+local.env
+.secrets
+
+# Local development files
+local_config.py
+debug.py
+scratch.py
+temp_*.py
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Package files
+*.tar.gz
+*.zip
+*.rar
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# OS generated files
+.fuse_hidden*
+.nfs*
+
+# Node modules (if using any JS tools)
+node_modules/
+npm-debug.log*
+
+# Docker
+.dockerignore
+
+# Generated files
+*.generated.*
+auto_*
+
+# Temporary files
+tmp/
+.tmp/
+
+# Conductor specific
+.conductor/
+conductor_data/
+workflow_data/
+schedule_data/
+ai_sessions/
+conversation_memory/
+user_docs/
+user_workflows/
+
+# AI Provider API Logs
+*.api.log
+api_calls.log
+anthropic_calls.log
+openai_calls.log
+
+# Generated content
+generated_docs/
+ai_generated/
+output_documents/

@@ -1,0 +1,132 @@
+# Pre-commit hooks for Conductor AI-native workflow platform
+# Install: pre-commit install
+# Test: pre-commit run --all-files
+# Update: pre-commit autoupdate
+
+repos:
+  # Security & Secrets Detection (HIGHEST PRIORITY)
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        name: 🔐 Detect API keys and secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: ^(venv/|\.venv/|\.git/|user_docs/|user_workflows/|\.conductor/|\.secrets\.baseline)
+
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        name: 🛡️ Security vulnerability scan
+        args: [-r, src/, -f, json, -o, bandit-report.json]
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+        pass_filenames: false
+
+  # Python Code Quality
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        name: 🎨 Format Python code
+        language_version: python3.12
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: 📦 Sort Python imports
+        args: ["--profile", "black"]
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: 🧹 Lint Python code
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+        args: [
+          "--max-line-length=88",
+          "--extend-ignore=E203,W503",
+          "--exclude=venv,__pycache__,.git,user_docs,user_workflows,.conductor"
+        ]
+
+  # File Safety & Quality Checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: ✂️ Remove trailing whitespace
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+
+      - id: end-of-file-fixer
+        name: 📄 Fix end of file
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+
+      - id: check-added-large-files
+        name: 📏 Check for large files (>500KB)
+        args: ['--maxkb=500']
+
+      - id: check-json
+        name: 🔍 Validate JSON files
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+
+      - id: check-yaml
+        name: 📋 Validate YAML files
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+
+      - id: check-toml
+        name: ⚙️ Validate TOML files
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+
+      - id: check-merge-conflict
+        name: 🔀 Check for merge conflicts
+
+      - id: debug-statements
+        name: 🐛 Check for debug statements
+        exclude: ^(venv/|\.venv/|user_docs/|user_workflows/|\.conductor/)
+
+      - id: detect-private-key
+        name: 🔑 Detect private keys
+
+      - id: check-case-conflict
+        name: 📁 Check for filename case conflicts
+
+  # Conductor-specific Security & Privacy Checks
+  - repo: local
+    hooks:
+      - id: check-user-content-isolation
+        name: 🚫 Verify user content is gitignored
+        entry: scripts/check-user-content.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: check-no-hardcoded-secrets
+        name: 🕵️ Scan for hardcoded secrets in code
+        entry: scripts/check-secrets.sh
+        language: system
+        files: \.(py|yaml|yml|json|md|txt|sh)$
+        exclude: ^(venv/|\.venv/|\.git/|user_docs/|user_workflows/|\.conductor/|\.secrets\.baseline|bandit-report\.json)
+
+      - id: test-gitignore-effectiveness
+        name: ✅ Test gitignore protects user data
+        entry: scripts/test-gitignore.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: check-no-personal-data-paths
+        name: 👤 Check for personal data paths in code
+        entry: scripts/check-personal-paths.sh
+        language: system
+        files: \.py$
+        exclude: ^(venv/|\.venv/|tests?/|user_docs/|user_workflows/|\.conductor/)
+
+# Global configuration
+default_install_hook_types: [pre-commit, pre-push]
+minimum_pre_commit_version: 3.0.0
+default_stages: [commit]
+
+# Fail fast - stop on first error
+fail_fast: true

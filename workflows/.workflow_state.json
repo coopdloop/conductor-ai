@@ -1,0 +1,1837 @@
+{
+  "workflows": [
+    {
+      "id": "weekly_service_owner_check_in",
+      "title": "Weekly Service Owner Check-in",
+      "description": "Template for following up with service owners on tasks and issues",
+      "status": "active",
+      "priority": 2,
+      "created_at": "2026-03-11T15:01:54.645811",
+      "updated_at": "2026-03-11T15:01:54.649244",
+      "due_date": "2024-01-15T08:00:00",
+      "tags": [
+        "follow-up",
+        "communication",
+        "stakeholders"
+      ],
+      "actions": [
+        {
+          "id": "action_1",
+          "type": "custom_command",
+          "description": "Review current open tasks with stakeholders",
+          "parameters": {
+            "description": "Review current open tasks with stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_2",
+          "type": "follow_up",
+          "description": "Follow up with John Smith on authentication service issues",
+          "parameters": {
+            "target": "John Smith on authentication service issues",
+            "description": "Follow up with John Smith on authentication service issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_3",
+          "type": "custom_command",
+          "description": "Check status of database migration with data team",
+          "parameters": {
+            "description": "Check status of database migration with data team"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_4",
+          "type": "custom_command",
+          "description": "Send summary email to project stakeholders",
+          "parameters": {
+            "description": "Send summary email to project stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_5",
+          "type": "custom_command",
+          "description": "Update JIRA tickets with current status",
+          "parameters": {
+            "description": "Update JIRA tickets with current status"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_6",
+          "type": "custom_command",
+          "description": "Schedule follow-up meeting if issues remain unresolved",
+          "parameters": {
+            "description": "Schedule follow-up meeting if issues remain unresolved"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_7",
+          "type": "custom_command",
+          "description": "[ ] Review current open tasks with stakeholders",
+          "parameters": {
+            "description": "[ ] Review current open tasks with stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_8",
+          "type": "follow_up",
+          "description": "[ ] Follow up with John Smith on authentication service issues",
+          "parameters": {
+            "target": "John Smith on authentication service issues",
+            "description": "[ ] Follow up with John Smith on authentication service issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_9",
+          "type": "custom_command",
+          "description": "[ ] Check status of database migration with data team",
+          "parameters": {
+            "description": "[ ] Check status of database migration with data team"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_10",
+          "type": "custom_command",
+          "description": "[ ] Send summary email to project stakeholders",
+          "parameters": {
+            "description": "[ ] Send summary email to project stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_11",
+          "type": "custom_command",
+          "description": "[ ] Update JIRA tickets with current status",
+          "parameters": {
+            "description": "[ ] Update JIRA tickets with current status"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_12",
+          "type": "custom_command",
+          "description": "[ ] Schedule follow-up meeting if issues remain unresolved",
+          "parameters": {
+            "description": "[ ] Schedule follow-up meeting if issues remain unresolved"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_13",
+          "type": "reminder",
+          "description": "Remind me tomorrow at 8am to check on progress",
+          "parameters": {
+            "target": "tomorrow",
+            "description": "Remind me tomorrow at 8am to check on progress",
+            "timing": "8am to check on progress"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_14",
+          "type": "follow_up",
+          "description": "Follow up with service owners weekly",
+          "parameters": {
+            "target": "service owners weekly",
+            "description": "Follow up with service owners weekly"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_15",
+          "type": "custom_command",
+          "description": "Alert if any task is blocked for more than 2 days",
+          "parameters": {
+            "description": "Alert if any task is blocked for more than 2 days"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_16",
+          "type": "custom_command",
+          "description": "Authentication Service: john.smith@company.com",
+          "parameters": {
+            "description": "Authentication Service: john.smith@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_17",
+          "type": "custom_command",
+          "description": "Database Team: data-team@company.com",
+          "parameters": {
+            "description": "Database Team: data-team@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_18",
+          "type": "custom_command",
+          "description": "Infrastructure: ops-team@company.com",
+          "parameters": {
+            "description": "Infrastructure: ops-team@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_19",
+          "type": "custom_command",
+          "description": "Send follow-up emails every Tuesday and Friday",
+          "parameters": {
+            "description": "Send follow-up emails every Tuesday and Friday"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_20",
+          "type": "custom_command",
+          "description": "Escalate to manager if no response after 2 attempts",
+          "parameters": {
+            "description": "Escalate to manager if no response after 2 attempts"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_21",
+          "type": "custom_command",
+          "description": "Include JIRA ticket references in all communications",
+          "parameters": {
+            "description": "Include JIRA ticket references in all communications"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_22",
+          "type": "custom_command",
+          "description": "Schedule meetings only if email/chat resolution fails",
+          "parameters": {
+            "description": "Schedule meetings only if email/chat resolution fails"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_23",
+          "type": "custom_command",
+          "description": "Copy this template for each follow-up cycle",
+          "parameters": {
+            "description": "Copy this template for each follow-up cycle"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_24",
+          "type": "custom_command",
+          "description": "Update service owner names and contact info",
+          "parameters": {
+            "description": "Update service owner names and contact info"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_25",
+          "type": "custom_command",
+          "description": "Customize tasks based on current issues",
+          "parameters": {
+            "description": "Customize tasks based on current issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_26",
+          "type": "custom_command",
+          "description": "Set appropriate due dates and reminders",
+          "parameters": {
+            "description": "Set appropriate due dates and reminders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_27",
+          "type": "custom_command",
+          "description": "Execute workflow using `conductor workflows -c filename.md`",
+          "parameters": {
+            "description": "Execute workflow using `conductor workflows -c filename.md`"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        }
+      ],
+      "reminders": [
+        {
+          "id": "reminder_1",
+          "workflow_id": "weekly_service_owner_check_in",
+          "message": "tomorrow",
+          "scheduled_for": "2026-03-12T08:00:00",
+          "completed": false,
+          "recurring": null
+        }
+      ],
+      "metadata": {
+        "created_at": "2026-03-11T15:01:54.644006",
+        "description": "Template for following up with service owners on tasks and issues",
+        "due_date": "2024-01-15T08:00:00",
+        "priority": 2,
+        "status": "pending",
+        "tags": [
+          "follow-up",
+          "communication",
+          "stakeholders"
+        ],
+        "title": "Weekly Service Owner Check-in"
+      }
+    },
+    {
+      "id": "failed_authentication_alert",
+      "title": "Failed Authentication Alert",
+      "description": "Template for following up with service owners on tasks and issues",
+      "status": "pending",
+      "priority": 2,
+      "created_at": "2026-03-11T19:00:55.642357",
+      "updated_at": "2026-03-11T19:00:55.642359",
+      "due_date": "2024-01-15T08:00:00",
+      "tags": [
+        "follow-up",
+        "communication",
+        "stakeholders"
+      ],
+      "actions": [
+        {
+          "id": "action_1",
+          "type": "custom_command",
+          "description": "Review current open tasks with stakeholders",
+          "parameters": {
+            "description": "Review current open tasks with stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_2",
+          "type": "follow_up",
+          "description": "Follow up with John Smith on authentication service issues",
+          "parameters": {
+            "target": "John Smith on authentication service issues",
+            "description": "Follow up with John Smith on authentication service issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_3",
+          "type": "custom_command",
+          "description": "Check status of database migration with data team",
+          "parameters": {
+            "description": "Check status of database migration with data team"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_4",
+          "type": "custom_command",
+          "description": "Send summary email to project stakeholders",
+          "parameters": {
+            "description": "Send summary email to project stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_5",
+          "type": "custom_command",
+          "description": "Update JIRA tickets with current status",
+          "parameters": {
+            "description": "Update JIRA tickets with current status"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_6",
+          "type": "custom_command",
+          "description": "Schedule follow-up meeting if issues remain unresolved",
+          "parameters": {
+            "description": "Schedule follow-up meeting if issues remain unresolved"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_7",
+          "type": "custom_command",
+          "description": "[ ] Review current open tasks with stakeholders",
+          "parameters": {
+            "description": "[ ] Review current open tasks with stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_8",
+          "type": "follow_up",
+          "description": "[ ] Follow up with John Smith on authentication service issues",
+          "parameters": {
+            "target": "John Smith on authentication service issues",
+            "description": "[ ] Follow up with John Smith on authentication service issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_9",
+          "type": "custom_command",
+          "description": "[ ] Check status of database migration with data team",
+          "parameters": {
+            "description": "[ ] Check status of database migration with data team"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_10",
+          "type": "custom_command",
+          "description": "[ ] Send summary email to project stakeholders",
+          "parameters": {
+            "description": "[ ] Send summary email to project stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_11",
+          "type": "custom_command",
+          "description": "[ ] Update JIRA tickets with current status",
+          "parameters": {
+            "description": "[ ] Update JIRA tickets with current status"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_12",
+          "type": "custom_command",
+          "description": "[ ] Schedule follow-up meeting if issues remain unresolved",
+          "parameters": {
+            "description": "[ ] Schedule follow-up meeting if issues remain unresolved"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_13",
+          "type": "reminder",
+          "description": "Remind me tomorrow at 8am to check on progress",
+          "parameters": {
+            "target": "tomorrow",
+            "description": "Remind me tomorrow at 8am to check on progress",
+            "timing": "8am to check on progress"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_14",
+          "type": "follow_up",
+          "description": "Follow up with service owners weekly",
+          "parameters": {
+            "target": "service owners weekly",
+            "description": "Follow up with service owners weekly"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_15",
+          "type": "custom_command",
+          "description": "Alert if any task is blocked for more than 2 days",
+          "parameters": {
+            "description": "Alert if any task is blocked for more than 2 days"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_16",
+          "type": "custom_command",
+          "description": "Authentication Service: john.smith@company.com",
+          "parameters": {
+            "description": "Authentication Service: john.smith@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_17",
+          "type": "custom_command",
+          "description": "Database Team: data-team@company.com",
+          "parameters": {
+            "description": "Database Team: data-team@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_18",
+          "type": "custom_command",
+          "description": "Infrastructure: ops-team@company.com",
+          "parameters": {
+            "description": "Infrastructure: ops-team@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_19",
+          "type": "custom_command",
+          "description": "Send follow-up emails every Tuesday and Friday",
+          "parameters": {
+            "description": "Send follow-up emails every Tuesday and Friday"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_20",
+          "type": "custom_command",
+          "description": "Escalate to manager if no response after 2 attempts",
+          "parameters": {
+            "description": "Escalate to manager if no response after 2 attempts"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_21",
+          "type": "custom_command",
+          "description": "Include JIRA ticket references in all communications",
+          "parameters": {
+            "description": "Include JIRA ticket references in all communications"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_22",
+          "type": "custom_command",
+          "description": "Schedule meetings only if email/chat resolution fails",
+          "parameters": {
+            "description": "Schedule meetings only if email/chat resolution fails"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_23",
+          "type": "custom_command",
+          "description": "Copy this template for each follow-up cycle",
+          "parameters": {
+            "description": "Copy this template for each follow-up cycle"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_24",
+          "type": "custom_command",
+          "description": "Update service owner names and contact info",
+          "parameters": {
+            "description": "Update service owner names and contact info"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_25",
+          "type": "custom_command",
+          "description": "Customize tasks based on current issues",
+          "parameters": {
+            "description": "Customize tasks based on current issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_26",
+          "type": "custom_command",
+          "description": "Set appropriate due dates and reminders",
+          "parameters": {
+            "description": "Set appropriate due dates and reminders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_27",
+          "type": "custom_command",
+          "description": "Execute workflow using `conductor workflows -c filename.md`",
+          "parameters": {
+            "description": "Execute workflow using `conductor workflows -c filename.md`"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        }
+      ],
+      "reminders": [
+        {
+          "id": "reminder_1",
+          "workflow_id": "failed_authentication_alert",
+          "message": "tomorrow",
+          "scheduled_for": "2026-03-12T08:00:00",
+          "completed": false,
+          "recurring": null
+        }
+      ],
+      "metadata": {
+        "created_at": "2026-03-11T19:00:55.640318",
+        "description": "Template for following up with service owners on tasks and issues",
+        "due_date": "2024-01-15T08:00:00",
+        "priority": 2,
+        "status": "pending",
+        "tags": [
+          "follow-up",
+          "communication",
+          "stakeholders"
+        ],
+        "title": "Failed Authentication Alert"
+      }
+    },
+    {
+      "id": "test_workflow",
+      "title": "Test Workflow",
+      "description": "Template for following up with service owners on tasks and issues",
+      "status": "pending",
+      "priority": 2,
+      "created_at": "2026-03-11T19:07:54.794152",
+      "updated_at": "2026-03-11T19:07:54.794157",
+      "due_date": "2024-01-15T08:00:00",
+      "tags": [
+        "follow-up",
+        "communication",
+        "stakeholders"
+      ],
+      "actions": [
+        {
+          "id": "action_1",
+          "type": "custom_command",
+          "description": "Review current open tasks with stakeholders",
+          "parameters": {
+            "description": "Review current open tasks with stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_2",
+          "type": "follow_up",
+          "description": "Follow up with John Smith on authentication service issues",
+          "parameters": {
+            "target": "John Smith on authentication service issues",
+            "description": "Follow up with John Smith on authentication service issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_3",
+          "type": "custom_command",
+          "description": "Check status of database migration with data team",
+          "parameters": {
+            "description": "Check status of database migration with data team"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_4",
+          "type": "custom_command",
+          "description": "Send summary email to project stakeholders",
+          "parameters": {
+            "description": "Send summary email to project stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_5",
+          "type": "custom_command",
+          "description": "Update JIRA tickets with current status",
+          "parameters": {
+            "description": "Update JIRA tickets with current status"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_6",
+          "type": "custom_command",
+          "description": "Schedule follow-up meeting if issues remain unresolved",
+          "parameters": {
+            "description": "Schedule follow-up meeting if issues remain unresolved"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_7",
+          "type": "custom_command",
+          "description": "[ ] Review current open tasks with stakeholders",
+          "parameters": {
+            "description": "[ ] Review current open tasks with stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_8",
+          "type": "follow_up",
+          "description": "[ ] Follow up with John Smith on authentication service issues",
+          "parameters": {
+            "target": "John Smith on authentication service issues",
+            "description": "[ ] Follow up with John Smith on authentication service issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_9",
+          "type": "custom_command",
+          "description": "[ ] Check status of database migration with data team",
+          "parameters": {
+            "description": "[ ] Check status of database migration with data team"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_10",
+          "type": "custom_command",
+          "description": "[ ] Send summary email to project stakeholders",
+          "parameters": {
+            "description": "[ ] Send summary email to project stakeholders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_11",
+          "type": "custom_command",
+          "description": "[ ] Update JIRA tickets with current status",
+          "parameters": {
+            "description": "[ ] Update JIRA tickets with current status"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_12",
+          "type": "custom_command",
+          "description": "[ ] Schedule follow-up meeting if issues remain unresolved",
+          "parameters": {
+            "description": "[ ] Schedule follow-up meeting if issues remain unresolved"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_13",
+          "type": "reminder",
+          "description": "Remind me tomorrow at 8am to check on progress",
+          "parameters": {
+            "target": "tomorrow",
+            "description": "Remind me tomorrow at 8am to check on progress",
+            "timing": "8am to check on progress"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_14",
+          "type": "follow_up",
+          "description": "Follow up with service owners weekly",
+          "parameters": {
+            "target": "service owners weekly",
+            "description": "Follow up with service owners weekly"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_15",
+          "type": "custom_command",
+          "description": "Alert if any task is blocked for more than 2 days",
+          "parameters": {
+            "description": "Alert if any task is blocked for more than 2 days"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_16",
+          "type": "custom_command",
+          "description": "Authentication Service: john.smith@company.com",
+          "parameters": {
+            "description": "Authentication Service: john.smith@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_17",
+          "type": "custom_command",
+          "description": "Database Team: data-team@company.com",
+          "parameters": {
+            "description": "Database Team: data-team@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_18",
+          "type": "custom_command",
+          "description": "Infrastructure: ops-team@company.com",
+          "parameters": {
+            "description": "Infrastructure: ops-team@company.com"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_19",
+          "type": "custom_command",
+          "description": "Send follow-up emails every Tuesday and Friday",
+          "parameters": {
+            "description": "Send follow-up emails every Tuesday and Friday"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_20",
+          "type": "custom_command",
+          "description": "Escalate to manager if no response after 2 attempts",
+          "parameters": {
+            "description": "Escalate to manager if no response after 2 attempts"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_21",
+          "type": "custom_command",
+          "description": "Include JIRA ticket references in all communications",
+          "parameters": {
+            "description": "Include JIRA ticket references in all communications"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_22",
+          "type": "custom_command",
+          "description": "Schedule meetings only if email/chat resolution fails",
+          "parameters": {
+            "description": "Schedule meetings only if email/chat resolution fails"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_23",
+          "type": "custom_command",
+          "description": "Copy this template for each follow-up cycle",
+          "parameters": {
+            "description": "Copy this template for each follow-up cycle"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_24",
+          "type": "custom_command",
+          "description": "Update service owner names and contact info",
+          "parameters": {
+            "description": "Update service owner names and contact info"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_25",
+          "type": "custom_command",
+          "description": "Customize tasks based on current issues",
+          "parameters": {
+            "description": "Customize tasks based on current issues"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_26",
+          "type": "custom_command",
+          "description": "Set appropriate due dates and reminders",
+          "parameters": {
+            "description": "Set appropriate due dates and reminders"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_27",
+          "type": "custom_command",
+          "description": "Execute workflow using `conductor workflows -c filename.md`",
+          "parameters": {
+            "description": "Execute workflow using `conductor workflows -c filename.md`"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        }
+      ],
+      "reminders": [
+        {
+          "id": "reminder_1",
+          "workflow_id": "test_workflow",
+          "message": "tomorrow",
+          "scheduled_for": "2026-03-12T08:00:00",
+          "completed": false,
+          "recurring": null
+        }
+      ],
+      "metadata": {
+        "created_at": "2026-03-11T19:07:54.791718",
+        "description": "Template for following up with service owners on tasks and issues",
+        "due_date": "2024-01-15T08:00:00",
+        "priority": 2,
+        "status": "pending",
+        "tags": [
+          "follow-up",
+          "communication",
+          "stakeholders"
+        ],
+        "title": "Test Workflow"
+      }
+    },
+    {
+      "id": "search_head_cluster_troublesho",
+      "title": "Search Head Cluster Troubleshooting",
+      "description": "Systematic review and updating of project documentation",
+      "status": "active",
+      "priority": 3,
+      "created_at": "2026-03-11T19:08:21.576562",
+      "updated_at": "2026-03-11T19:08:23.704766",
+      "due_date": "2024-01-20T17:00:00",
+      "tags": [
+        "documentation",
+        "review",
+        "maintenance"
+      ],
+      "actions": [
+        {
+          "id": "action_1",
+          "type": "custom_command",
+          "description": "Review API documentation for accuracy",
+          "parameters": {
+            "description": "Review API documentation for accuracy"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_2",
+          "type": "custom_command",
+          "description": "Update README files in active repositories",
+          "parameters": {
+            "description": "Update README files in active repositories"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_3",
+          "type": "custom_command",
+          "description": "Check Confluence pages for outdated information",
+          "parameters": {
+            "description": "Check Confluence pages for outdated information"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_4",
+          "type": "custom_command",
+          "description": "Verify all code examples still work",
+          "parameters": {
+            "description": "Verify all code examples still work"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_5",
+          "type": "custom_command",
+          "description": "Update architecture diagrams if needed",
+          "parameters": {
+            "description": "Update architecture diagrams if needed"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_6",
+          "type": "custom_command",
+          "description": "Review and update runbook procedures",
+          "parameters": {
+            "description": "Review and update runbook procedures"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_7",
+          "type": "confluence_publish",
+          "description": "Publish updated documentation to Confluence",
+          "parameters": {
+            "target": "updated documentation",
+            "description": "Publish updated documentation to Confluence"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_8",
+          "type": "custom_command",
+          "description": "Notify team of documentation changes",
+          "parameters": {
+            "description": "Notify team of documentation changes"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_9",
+          "type": "custom_command",
+          "description": "All endpoints documented",
+          "parameters": {
+            "description": "All endpoints documented"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_10",
+          "type": "custom_command",
+          "description": "Request/response examples current",
+          "parameters": {
+            "description": "Request/response examples current"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_11",
+          "type": "custom_command",
+          "description": "Authentication methods up to date",
+          "parameters": {
+            "description": "Authentication methods up to date"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_12",
+          "type": "custom_command",
+          "description": "Error codes and messages accurate",
+          "parameters": {
+            "description": "Error codes and messages accurate"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_13",
+          "type": "custom_command",
+          "description": "Rate limiting information current",
+          "parameters": {
+            "description": "Rate limiting information current"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_14",
+          "type": "custom_command",
+          "description": "README.md files complete and current",
+          "parameters": {
+            "description": "README.md files complete and current"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_15",
+          "type": "custom_command",
+          "description": "Installation instructions work",
+          "parameters": {
+            "description": "Installation instructions work"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_16",
+          "type": "custom_command",
+          "description": "Configuration examples valid",
+          "parameters": {
+            "description": "Configuration examples valid"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_17",
+          "type": "custom_command",
+          "description": "Troubleshooting guides helpful",
+          "parameters": {
+            "description": "Troubleshooting guides helpful"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_18",
+          "type": "custom_command",
+          "description": "Links to external resources working",
+          "parameters": {
+            "description": "Links to external resources working"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_19",
+          "type": "custom_command",
+          "description": "Runbooks reflect current procedures",
+          "parameters": {
+            "description": "Runbooks reflect current procedures"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_20",
+          "type": "custom_command",
+          "description": "Monitoring and alerting documented",
+          "parameters": {
+            "description": "Monitoring and alerting documented"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_21",
+          "type": "custom_command",
+          "description": "Deployment procedures current",
+          "parameters": {
+            "description": "Deployment procedures current"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_22",
+          "type": "custom_command",
+          "description": "Rollback procedures tested",
+          "parameters": {
+            "description": "Rollback procedures tested"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_23",
+          "type": "custom_command",
+          "description": "Emergency contacts updated",
+          "parameters": {
+            "description": "Emergency contacts updated"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_24",
+          "type": "custom_command",
+          "description": "[ ] Review API documentation for accuracy",
+          "parameters": {
+            "description": "[ ] Review API documentation for accuracy"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_25",
+          "type": "custom_command",
+          "description": "[ ] Update README files in active repositories",
+          "parameters": {
+            "description": "[ ] Update README files in active repositories"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_26",
+          "type": "custom_command",
+          "description": "[ ] Check Confluence pages for outdated information",
+          "parameters": {
+            "description": "[ ] Check Confluence pages for outdated information"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_27",
+          "type": "custom_command",
+          "description": "[ ] Verify all code examples still work",
+          "parameters": {
+            "description": "[ ] Verify all code examples still work"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_28",
+          "type": "custom_command",
+          "description": "[ ] Update architecture diagrams if needed",
+          "parameters": {
+            "description": "[ ] Update architecture diagrams if needed"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_29",
+          "type": "custom_command",
+          "description": "[ ] Review and update runbook procedures",
+          "parameters": {
+            "description": "[ ] Review and update runbook procedures"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_30",
+          "type": "confluence_publish",
+          "description": "[ ] Publish updated documentation to Confluence",
+          "parameters": {
+            "target": "updated documentation",
+            "description": "[ ] Publish updated documentation to Confluence"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_31",
+          "type": "custom_command",
+          "description": "[ ] Notify team of documentation changes",
+          "parameters": {
+            "description": "[ ] Notify team of documentation changes"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_32",
+          "type": "reminder",
+          "description": "Remind me monthly to review all documentation",
+          "parameters": {
+            "target": "monthly to review all documentation",
+            "description": "Remind me monthly to review all documentation"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_33",
+          "type": "custom_command",
+          "description": "Alert when documentation hasn't been updated in 90 days",
+          "parameters": {
+            "description": "Alert when documentation hasn't been updated in 90 days"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_34",
+          "type": "follow_up",
+          "description": "Follow up with team leads on documentation feedback",
+          "parameters": {
+            "target": "team leads on documentation feedback",
+            "description": "Follow up with team leads on documentation feedback"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_35",
+          "type": "custom_command",
+          "description": "[ ] All endpoints documented",
+          "parameters": {
+            "description": "[ ] All endpoints documented"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_36",
+          "type": "custom_command",
+          "description": "[ ] Request/response examples current",
+          "parameters": {
+            "description": "[ ] Request/response examples current"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_37",
+          "type": "custom_command",
+          "description": "[ ] Authentication methods up to date",
+          "parameters": {
+            "description": "[ ] Authentication methods up to date"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_38",
+          "type": "custom_command",
+          "description": "[ ] Error codes and messages accurate",
+          "parameters": {
+            "description": "[ ] Error codes and messages accurate"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_39",
+          "type": "custom_command",
+          "description": "[ ] Rate limiting information current",
+          "parameters": {
+            "description": "[ ] Rate limiting information current"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_40",
+          "type": "custom_command",
+          "description": "[ ] README.md files complete and current",
+          "parameters": {
+            "description": "[ ] README.md files complete and current"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_41",
+          "type": "custom_command",
+          "description": "[ ] Installation instructions work",
+          "parameters": {
+            "description": "[ ] Installation instructions work"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_42",
+          "type": "custom_command",
+          "description": "[ ] Configuration examples valid",
+          "parameters": {
+            "description": "[ ] Configuration examples valid"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_43",
+          "type": "custom_command",
+          "description": "[ ] Troubleshooting guides helpful",
+          "parameters": {
+            "description": "[ ] Troubleshooting guides helpful"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_44",
+          "type": "custom_command",
+          "description": "[ ] Links to external resources working",
+          "parameters": {
+            "description": "[ ] Links to external resources working"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_45",
+          "type": "custom_command",
+          "description": "[ ] Runbooks reflect current procedures",
+          "parameters": {
+            "description": "[ ] Runbooks reflect current procedures"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_46",
+          "type": "custom_command",
+          "description": "[ ] Monitoring and alerting documented",
+          "parameters": {
+            "description": "[ ] Monitoring and alerting documented"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_47",
+          "type": "custom_command",
+          "description": "[ ] Deployment procedures current",
+          "parameters": {
+            "description": "[ ] Deployment procedures current"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_48",
+          "type": "custom_command",
+          "description": "[ ] Rollback procedures tested",
+          "parameters": {
+            "description": "[ ] Rollback procedures tested"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_49",
+          "type": "custom_command",
+          "description": "[ ] Emergency contacts updated",
+          "parameters": {
+            "description": "[ ] Emergency contacts updated"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_50",
+          "type": "custom_command",
+          "description": "Clear, concise language",
+          "parameters": {
+            "description": "Clear, concise language"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_51",
+          "type": "custom_command",
+          "description": "Logical organization",
+          "parameters": {
+            "description": "Logical organization"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_52",
+          "type": "custom_command",
+          "description": "Searchable keywords",
+          "parameters": {
+            "description": "Searchable keywords"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_53",
+          "type": "custom_command",
+          "description": "Regular update schedule",
+          "parameters": {
+            "description": "Regular update schedule"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_54",
+          "type": "custom_command",
+          "description": "Version control integration",
+          "parameters": {
+            "description": "Version control integration"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_55",
+          "type": "custom_command",
+          "description": "Automatically detect documentation changes",
+          "parameters": {
+            "description": "Automatically detect documentation changes"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_56",
+          "type": "custom_command",
+          "description": "Generate change summaries",
+          "parameters": {
+            "description": "Generate change summaries"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_57",
+          "type": "custom_command",
+          "description": "Trigger review workflows for major updates",
+          "parameters": {
+            "description": "Trigger review workflows for major updates"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_58",
+          "type": "custom_command",
+          "description": "Link checking for external references",
+          "parameters": {
+            "description": "Link checking for external references"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_59",
+          "type": "custom_command",
+          "description": "Code example validation",
+          "parameters": {
+            "description": "Code example validation"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_60",
+          "type": "custom_command",
+          "description": "Spelling and grammar checking",
+          "parameters": {
+            "description": "Spelling and grammar checking"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_61",
+          "type": "custom_command",
+          "description": "Accessibility compliance verification",
+          "parameters": {
+            "description": "Accessibility compliance verification"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_62",
+          "type": "confluence_publish",
+          "description": "Auto-publish approved changes to Confluence",
+          "parameters": {
+            "target": "approved changes",
+            "description": "Auto-publish approved changes to Confluence"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_63",
+          "type": "custom_command",
+          "description": "Send change notifications to relevant teams",
+          "parameters": {
+            "description": "Send change notifications to relevant teams"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_64",
+          "type": "custom_command",
+          "description": "Update internal documentation indices",
+          "parameters": {
+            "description": "Update internal documentation indices"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_65",
+          "type": "custom_command",
+          "description": "Draft updates in local markdown files",
+          "parameters": {
+            "description": "Draft updates in local markdown files"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_66",
+          "type": "custom_command",
+          "description": "Review with subject matter experts",
+          "parameters": {
+            "description": "Review with subject matter experts"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_67",
+          "type": "custom_command",
+          "description": "Test all procedures and examples",
+          "parameters": {
+            "description": "Test all procedures and examples"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_68",
+          "type": "custom_command",
+          "description": "Publish to Confluence with versioning",
+          "parameters": {
+            "description": "Publish to Confluence with versioning"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_69",
+          "type": "custom_command",
+          "description": "Notify stakeholders of changes",
+          "parameters": {
+            "description": "Notify stakeholders of changes"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        },
+        {
+          "id": "action_70",
+          "type": "custom_command",
+          "description": "Archive outdated versions",
+          "parameters": {
+            "description": "Archive outdated versions"
+          },
+          "completed": false,
+          "completed_at": null,
+          "error": null
+        }
+      ],
+      "reminders": [],
+      "metadata": {
+        "created_at": "2026-03-11T19:08:21.574484",
+        "description": "Systematic review and updating of project documentation",
+        "due_date": "2024-01-20T17:00:00",
+        "priority": 3,
+        "status": "pending",
+        "tags": [
+          "documentation",
+          "review",
+          "maintenance"
+        ],
+        "title": "Search Head Cluster Troubleshooting"
+      }
+    }
+  ],
+  "last_updated": "2026-03-11T19:08:23.704799"
+}

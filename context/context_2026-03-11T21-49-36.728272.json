@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-03-11T21:49:36.728272",
+  "current_workflow": null,
+  "active_workflows": [],
+  "scheduled_tasks": [],
+  "recent_activity": [],
+  "user_focus": null,
+  "priority_insights": {
+    "total_active_workflows": 0,
+    "high_priority_count": 0,
+    "overdue_count": 0,
+    "recommendations": []
+  },
+  "context_hash": "a3df12336b26b39f9ea2cdfaeb13a823"
+}
