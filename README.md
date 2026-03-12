@@ -1,114 +1,97 @@
-# 🤖 Conductor - AI-Native Workflow Orchestrator
+# Conductor
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **An AI-first workflow orchestration platform that serves as your persistent digital assistant, maintaining context across conversations and automating your daily work through intelligent skill-based workflows.**
+**An AI-native workflow orchestration platform that remembers, learns, and automates your daily work through intelligent conversation.**
 
-Conductor transforms how you manage daily work by providing an AI assistant that:
-- 🧠 **Remembers everything** - Persistent context across all conversations
-- 🛠️ **Automates workflows** - Intelligent skill-based task execution
-- 📚 **Manages documentation** - AI-generated docs with version control
-- ⏰ **Schedules smartly** - Context-aware reminders and follow-ups
-- 🔗 **Integrates services** - Seamless JIRA, Confluence, GitHub, and more
+Conductor transforms routine work management by providing a persistent AI assistant that maintains context across all your conversations, understands your work patterns, and automatically handles the tedious parts of project coordination.
 
-## 🚀 Quick Start (2 minutes)
+## Quick Start
 
 ```bash
-# 1. Clone and setup
+# Clone and setup
 git clone <your-repo-url>
 cd conductor
 python3 -m venv venv && source venv/bin/activate
 
-# 2. Install as binary with shell completion
+# Install with shell completion
 pip install -e .
 conductor completion --install
 
-# 3. Set your AI provider (choose one)
+# Configure your AI provider
 export ANTHROPIC_API_KEY="your-claude-key"
 # OR
 export OPENAI_API_KEY="your-openai-key"
 
-# 4. Start your AI assistant
+# Start your AI assistant
 conductor ai chat
 ```
 
-**That's it!** You now have a persistent AI assistant with shell completion.
+## Core Philosophy
 
-## 💬 AI Copilot Integration
+Instead of forcing you to adapt to rigid workflow templates, Conductor adapts to how you actually work. The AI learns your preferences, remembers ongoing projects, and proactively suggests next steps.
 
-### Core AI Interaction Patterns
+### Traditional Workflow Tools
+- Static templates that don't fit your specific situation
+- Manual task creation and status updates
+- Context switching between multiple applications
+- Repetitive documentation and follow-up work
 
-```bash
-# 💬 Conversational workflow management
-conductor ai chat
+### Conductor's Approach
+- **Conversational interface** - describe what you need in natural language
+- **Persistent memory** - AI remembers your projects, preferences, and work patterns
+- **Dynamic workflows** - processes adapt to your specific situation
+- **Proactive automation** - AI handles follow-ups and integrations automatically
 
-# 🎯 Quick questions and commands
-conductor ai ask "What should I prioritize today?"
-conductor ai ask "Create a bug investigation workflow"
-conductor ai ask "Schedule a team meeting for Friday"
+## AI-Driven Workflow Examples
 
-# 📊 Check your AI assistant's capabilities
-conductor ai status
-conductor ai skills
-```
-
-### AI-Driven Workflow Examples
-
-<details>
-<summary><b>🔍 Bug Investigation Workflow</b></summary>
-
+**Bug Investigation Workflow**
 ```bash
 conductor ai ask "Help me investigate a login bug affecting production users"
 
-# AI creates:
-# ✅ Bug investigation workflow with steps
-# ✅ Documentation template for findings
-# ✅ Scheduled follow-up reminders
-# ✅ Team notification tasks
+# AI automatically creates:
+# - Bug investigation workflow with specific steps
+# - Documentation template for findings
+# - Scheduled follow-up reminders
+# - Team notification tasks
 ```
-</details>
 
-<details>
-<summary><b>📚 Documentation Generation</b></summary>
-
+**Documentation Generation**
 ```bash
 conductor ai ask "Create API documentation for our user service"
 
 # AI generates:
-# ✅ Comprehensive API documentation
-# ✅ Code examples and usage patterns
-# ✅ Publishes to Confluence (if configured)
-# ✅ Sets review reminders with team
+# - Comprehensive API documentation
+# - Code examples and usage patterns
+# - Publishes to Confluence (if configured)
+# - Sets review reminders with team
 ```
-</details>
 
-<details>
-<summary><b>🔄 Daily Standup Prep</b></summary>
-
+**Daily Standup Preparation**
 ```bash
 conductor ai ask "Prepare my standup notes for tomorrow"
 
 # AI provides:
-# ✅ Summary of yesterday's completed work
-# ✅ Today's priorities based on deadlines
-# ✅ Blockers and dependencies to discuss
-# ✅ Follow-up actions needed from teammates
+# - Summary of yesterday's completed work
+# - Today's priorities based on deadlines
+# - Blockers and dependencies to discuss
+# - Follow-up actions needed from teammates
 ```
-</details>
 
-## 🧠 How AI Context Works
+## How AI Context Works
 
-Conductor's AI maintains **persistent memory** about:
-- **Your work patterns** - Learns how you prefer to work
-- **Project context** - Remembers ongoing projects and their status
-- **Team dynamics** - Understands your team structure and communication patterns
-- **Tools and services** - Knows your JIRA projects, Confluence spaces, etc.
-- **Preferences** - Adapts to your workflow style over time
+Conductor's AI maintains persistent memory about your work environment:
 
-### Context Engineering Example
+- **Work patterns** - learns how you prefer to structure projects
+- **Project context** - remembers ongoing initiatives and their status
+- **Team dynamics** - understands your team structure and communication style
+- **Tools and services** - knows your JIRA projects, Confluence spaces, etc.
+- **Preferences** - adapts to your workflow style over time
 
-```bash
+### Context Engineering in Action
+
+```
 You: "I'm starting work on the authentication system refactor"
 
 AI: I remember you mentioned this project last week. Based on our previous
@@ -123,41 +106,40 @@ AI: I remember you mentioned this project last week. Based on our previous
     coordinate with Maria's compliance review timeline?
 ```
 
-## 🛠️ Core Skills & Automation
+## Built-in Skills & Automation
 
-Conductor comes with built-in AI skills for common workflows:
+Conductor includes AI skills for common development workflows:
 
-### 📋 Project Management Skills
-- `bug_investigation` - Comprehensive bug tracking and resolution
-- `deployment_workflow` - Release planning and execution
-- `code_review_process` - Systematic code review workflows
+**Project Management**
+- `bug_investigation` - comprehensive bug tracking and resolution
+- `deployment_workflow` - release planning and execution
+- `code_review_process` - systematic code review workflows
 
-### 📚 Documentation Skills
+**Documentation**
 - `create_documentation` - AI-generated technical documentation
-- `update_documentation` - Keep docs current with code changes
-- `api_documentation` - Auto-generate API docs from code
+- `update_documentation` - keep docs current with code changes
+- `api_documentation` - auto-generate API docs from code
 
-### 🗓️ Daily Operations Skills
-- `standup_prep` - Daily meeting preparation and notes
-- `follow_up_management` - Track and manage action items
-- `priority_analysis` - Intelligent task prioritization
+**Daily Operations**
+- `standup_prep` - daily meeting preparation and notes
+- `follow_up_management` - track and manage action items
+- `priority_analysis` - intelligent task prioritization
 
-### View Available Skills
 ```bash
-conductor ai skills --detail
+conductor ai skills --detail  # View all available skills
 ```
 
-## 🔗 Service Integrations
+## Service Integrations
 
-Conductor integrates with your existing tools through **context-aware AI**:
+Conductor integrates with your existing tools through context-aware AI:
 
-### Supported Services
-- **JIRA** - Project tracking, issue management
-- **Confluence** - Documentation and knowledge base
-- **GitHub** - Code management and collaboration
-- **Slack** - Team communication and notifications
+**Supported Services**
+- JIRA - project tracking, issue management
+- Confluence - documentation and knowledge base
+- GitHub - code management and collaboration
+- Slack - team communication and notifications
 
-### Auto-Configuration
+**Configuration**
 ```bash
 # Set environment variables (all optional)
 export JIRA_API_TOKEN="your-token"
@@ -165,12 +147,11 @@ export JIRA_SERVER_URL="https://company.atlassian.net"
 export CONFLUENCE_API_TOKEN="your-token"
 export GITHUB_TOKEN="your-token"
 
-# Let AI configure integrations
-conductor services --configure
+# Verify integrations
 conductor services --status
 ```
 
-### AI-Powered Service Usage
+**AI-Powered Usage**
 ```bash
 # Instead of manually using JIRA:
 conductor ai ask "Create a JIRA ticket for the login bug I found"
@@ -182,90 +163,47 @@ conductor ai ask "Update our deployment docs with the new process"
 conductor ai ask "Create a PR for the authentication fix"
 ```
 
-## 📁 Installation Methods
+## Daily Usage Patterns
 
-### Method 1: Package Installation (Recommended)
+**Morning Startup**
 ```bash
-# Install as a proper Python package with shell completion
-git clone <your-repo>
-cd conductor
-python3 -m venv venv && source venv/bin/activate
-pip install -e .
-conductor completion --install
-```
-
-### Method 2: Direct Script Usage
-```bash
-# Run directly from the repository
-git clone <your-repo>
-cd conductor
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-python conductor.py ai chat
-```
-
-### Verify Installation
-```bash
-conductor --version
-conductor ai status
-```
-
-## 🎯 Usage Patterns
-
-### 🌅 Daily Workflow
-```bash
-# Start your day with AI
 conductor ai ask "What should I focus on today?"
-
-# Work with continuous AI assistance
-conductor ai chat
-# (Keep this running in a terminal for ongoing assistance)
-
-# End of day summary
-conductor ai ask "Summarize what I accomplished today"
 ```
 
-### 🔄 Project Workflows
+**Continuous Assistance**
 ```bash
-# Project initiation
+conductor ai chat  # Keep running in a terminal
+```
+
+**Project Management**
+```bash
 conductor ai ask "Help me start the user authentication project"
-
-# Ongoing development
 conductor ai ask "I finished the login component, what's next?"
-
-# Project completion
 conductor ai ask "Create release documentation for the auth project"
 ```
 
-### 📋 Task Management
+**End of Day**
 ```bash
-# Create structured workflows
-conductor ai ask "Plan out the database migration project"
-
-# Track progress
-conductor ai ask "Show me the status of all my active projects"
-
-# Handle blockers
-conductor ai ask "I'm blocked on the API integration, help me create an action plan"
+conductor ai ask "Summarize what I accomplished today"
 ```
 
-## 🔧 Configuration
+## Advanced Configuration
 
-### AI Provider Setup (Required)
+### AI Provider Setup
 ```bash
-# Anthropic Claude (Recommended)
+# Anthropic Claude (recommended)
 export ANTHROPIC_API_KEY="your-api-key"
 
-# OpenAI GPT (Alternative)
+# OpenAI GPT (alternative)
 export OPENAI_API_KEY="your-api-key"
 
-# Verify AI setup
+# Verify setup
 conductor ai status
 ```
 
-### Service Integrations (Optional)
+### Optional Service Integrations
 ```bash
-# Create .env file for integrations (optional)
+# Create .env file
 cat > .env << EOF
 # JIRA Integration
 JIRA_API_TOKEN=your_jira_token
@@ -278,53 +216,41 @@ CONFLUENCE_SERVER_URL=https://company.atlassian.net
 
 # GitHub Integration
 GITHUB_TOKEN=your_github_token
-
-# Slack Integration (optional)
-SLACK_BOT_TOKEN=your_slack_token
 EOF
-
-# Test integrations
-conductor services --status
 ```
 
-## 📚 Project Structure
+## Architecture
+
+Conductor is built around three core systems:
+
+**AI Core** - conversation management, persistent memory, skill execution
+**Workflow Engine** - dynamic process creation and execution
+**Integration Layer** - context-aware service connections
 
 ```
 conductor/
-├── 🤖 AI Core
+├── AI Core
 │   ├── src/ai/orchestrator.py          # Main AI orchestration
 │   ├── src/ai/context/                 # Context management & memory
 │   ├── src/ai/providers/               # Claude, OpenAI providers
 │   └── src/skills/                     # AI-callable workflow skills
 │
-├── 🔧 Core Systems
+├── Core Systems
 │   ├── src/core/workflow_engine.py     # Workflow execution
 │   ├── src/core/doc_processor.py       # Document generation
 │   ├── src/core/scheduler.py           # Smart scheduling
 │   └── src/core/mcp_manager.py         # Service integrations
 │
-├── 🎛️ Interface
-│   ├── conductor.py                    # Main CLI interface
-│   ├── src/conductor_main.py           # Binary entry point
-│   └── src/conductor.py                # Module interface
-│
-├── 📦 Package
-│   ├── setup.py                        # Package configuration
-│   ├── requirements.txt                 # Dependencies
-│   └── venv/                           # Virtual environment
-│
-└── 👤 User Content (gitignored)
-    ├── .conductor/                      # AI context & conversation memory
-    ├── user_docs/                      # Your generated documents
-    ├── user_workflows/                  # Your personal workflows
-    └── workflow_templates/              # Custom workflow templates
+└── User Content (automatically gitignored)
+    ├── .conductor/                     # AI context & memory
+    ├── user_docs/                     # Generated documents
+    └── user_workflows/                 # Personal workflows
 ```
 
-## 🎨 Advanced Usage
+## Custom Development
 
-### Custom Skill Development
+**Creating Custom Skills**
 ```python
-# Create custom AI skills for your specific workflows
 from skills.base import Skill, SkillExecutionResult
 
 class CustomDeploymentSkill(Skill):
@@ -332,7 +258,7 @@ class CustomDeploymentSkill(Skill):
     description = "Handle custom deployment workflow"
 
     async def execute(self, context, parameters, orchestrator=None):
-        # Your custom workflow logic
+        # Your workflow logic
         return SkillExecutionResult(
             success=True,
             result="Deployment workflow created",
@@ -340,86 +266,57 @@ class CustomDeploymentSkill(Skill):
         )
 ```
 
-### Programmatic API
+**Programmatic API**
 ```python
 from ai.orchestrator import AIOrchestrator
 
-# Initialize AI orchestrator
 orchestrator = AIOrchestrator()
-
-# Start AI conversation
 session_id = await orchestrator.start_conversation()
 
-# AI-driven workflow creation
 response = await orchestrator.chat(
     session_id,
     "Create a deployment checklist for the new release"
 )
 ```
 
-## 🚀 Why AI-Native?
-
-### Traditional Workflow Tools
-- ❌ Static templates and rigid processes
-- ❌ Manual task creation and tracking
-- ❌ Context switching between tools
-- ❌ Repetitive documentation work
-
-### Conductor's AI-First Approach
-- ✅ **Dynamic workflows** adapted to your specific situation
-- ✅ **Conversational interface** - just describe what you need
-- ✅ **Persistent memory** - AI remembers your preferences and context
-- ✅ **Proactive assistance** - AI suggests next steps and handles follow-ups
-- ✅ **Intelligent automation** - Context-aware integration with your tools
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Follow the AI-native development patterns
-4. Add tests for new functionality
-5. Update documentation
-6. Commit changes (`git commit -m 'Add amazing AI feature'`)
-7. Push to branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
-
-### Development Setup
-```bash
-git clone <your-fork>
-cd conductor
-python3 -m venv venv && source venv/bin/activate
-pip install -e ".[dev]"  # Install with dev dependencies
-pytest  # Run tests
-```
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Anthropic Claude](https://www.anthropic.com/) for conversational AI capabilities
-- [OpenAI](https://openai.com/) for GPT model support
-- [Rich](https://github.com/Textualize/rich) for beautiful CLI interfaces
-- [Click](https://click.palletsprojects.com/) for CLI framework
-
-## 🎯 Quick Command Reference
+## Command Reference
 
 ```bash
-# AI Commands (Primary Interface)
-conductor ai chat                 # Start conversational AI assistant
+# Primary AI Interface
+conductor ai chat                 # Conversational AI assistant
 conductor ai ask "question"       # Quick AI questions and commands
 conductor ai status               # Check AI provider and capabilities
 conductor ai skills               # List available automation skills
 
-# Traditional Commands (Fallback)
-conductor start --dashboard       # Enhanced dashboard view
-conductor workflows               # Manage workflows manually
+# Traditional Interface
+conductor workflows               # Manual workflow management
 conductor docs                    # Document management
-conductor services --status       # Check service integrations
-conductor completion --install    # Enable shell tab completion
+conductor services --status       # Service integration status
+conductor completion --install    # Shell completion setup
 ```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Follow AI-native development patterns
+4. Add tests for new functionality
+5. Update documentation
+6. Submit a pull request
+
+**Development Setup**
+```bash
+git clone <your-fork>
+cd conductor
+python3 -m venv venv && source venv/bin/activate
+pip install -e ".[dev]"
+pytest  # Run tests
+```
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**🤖 Conductor** - Your AI-native workflow orchestration platform. Less clicking, more creating. Let the AI handle the process while you focus on the work.
+**Conductor** - AI-native workflow orchestration. Less process management, more productive work.
