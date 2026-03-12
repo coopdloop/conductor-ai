@@ -6,8 +6,10 @@ A comprehensive daily workflow orchestrator with documentation processing,
 skill-based workflows, scheduling, and MCP service integration.
 """
 
+import asyncio
 import json
 import os
+import subprocess
 import sys
 import time
 from datetime import datetime, timedelta
@@ -857,6 +859,213 @@ GITHUB_TOKEN=your-github-token
     console.print(
         "\n[blue]💡 The tool works offline - integrations are optional![/blue]"
     )
+
+
+@cli.group()
+def mcp():
+    """MCP (Model Context Protocol) configuration and management"""
+    pass
+
+
+@mcp.command("setup")
+@click.option(
+    "--copy-from-vscode",
+    is_flag=True,
+    help="Copy MCP configuration from VSCode settings"
+)
+@click.option(
+    "--install-servers",
+    is_flag=True,
+    help="Install common MCP servers via npm"
+)
+def mcp_setup(copy_from_vscode, install_servers):
+    """Set up MCP integration for Conductor"""
+    try:
+        from mcp.bridge import MCPBridge
+    except ImportError:
+        console.print("[red]❌ MCP integration not found. Please install conductor with: pip install -e .[dev][/red]")
+        return
+
+    async def setup_mcp():
+        bridge = MCPBridge()
+
+        if install_servers:
+            console.print("[blue]📦 Installing MCP servers...[/blue]")
+            success = await bridge.install_mcp_servers()
+            if success:
+                console.print("[green]✅ MCP servers installed successfully[/green]")
+            else:
+                console.print("[red]❌ Failed to install some MCP servers[/red]")
+
+        console.print("[blue]🔧 Setting up MCP bridge...[/blue]")
+        success = await bridge.setup_bridge()
+
+        if success:
+            console.print("[green]✅ MCP bridge configured successfully[/green]")
+            status = bridge.get_config_status()
+            console.print(f"[dim]Config path: {status['config_path']}[/dim]")
+            console.print(f"[dim]Servers configured: {status['servers_configured']}[/dim]")
+        else:
+            console.print("[red]❌ Failed to setup MCP bridge[/red]")
+
+    asyncio.run(setup_mcp())
+
+
+@mcp.command("status")
+def mcp_status():
+    """Show MCP configuration status"""
+    try:
+        from mcp.bridge import MCPBridge
+        from mcp.client import MCPClient
+    except ImportError:
+        console.print("[red]❌ MCP integration not found. Please install conductor with: pip install -e .[dev][/red]")
+        return
+
+    async def check_status():
+        bridge = MCPBridge()
+        status = bridge.get_config_status()
+
+        console.print(Panel.fit("[bold blue]MCP Configuration Status[/bold blue]", border_style="blue"))
+
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("Component", style="cyan")
+        table.add_column("Status", style="white")
+        table.add_column("Details", style="dim")
+
+        # Config status
+        config_status = "✅ Exists" if status['config_exists'] else "❌ Missing"
+        table.add_row("Configuration", config_status, status['config_path'])
+
+        # Bridge status
+        bridge_status = "✅ Configured" if status['bridge_exists'] else "❌ Not configured"
+        table.add_row("VSCode Bridge", bridge_status, "Automatic config detection")
+
+        # Server count
+        server_count = f"{status['servers_configured']} servers configured"
+        table.add_row("MCP Servers", "📊 Count", server_count)
+
+        console.print(table)
+
+        # Test connections if config exists
+        if status['config_exists'] and status['servers_configured'] > 0:
+            console.print("\n[blue]🔗 Testing MCP server connections...[/blue]")
+
+            try:
+                connections = await bridge.test_all_connections()
+
+                conn_table = Table(show_header=True, header_style="bold green")
+                conn_table.add_column("Server", style="cyan")
+                conn_table.add_column("Connection", style="white")
+
+                for server_name, connected in connections.items():
+                    status_icon = "✅ Connected" if connected else "❌ Failed"
+                    conn_table.add_row(server_name, status_icon)
+
+                console.print(conn_table)
+
+            except Exception as e:
+                console.print(f"[red]❌ Connection test failed: {e}[/red]")
+
+    asyncio.run(check_status())
+
+
+@mcp.command("test")
+@click.argument("server_name")
+def mcp_test(server_name):
+    """Test connection to a specific MCP server"""
+    try:
+        from mcp.client import MCPClient
+    except ImportError:
+        console.print("[red]❌ MCP integration not found. Please install conductor with: pip install -e .[dev][/red]")
+        return
+
+    async def test_connection():
+        client = MCPClient()
+
+        console.print(f"[blue]🔌 Testing connection to {server_name}...[/blue]")
+
+        try:
+            success = await client.test_connection(server_name)
+
+            if success:
+                console.print(f"[green]✅ Successfully connected to {server_name}[/green]")
+
+                # List available tools
+                tools = await client.list_tools(server_name)
+                if tools:
+                    console.print(f"\n[blue]🛠️  Available tools ({len(tools)}):[/blue]")
+                    for tool in tools:
+                        console.print(f"  • {tool.get('name', 'Unknown')}: {tool.get('description', 'No description')}")
+                else:
+                    console.print("[dim]No tools available[/dim]")
+
+            else:
+                console.print(f"[red]❌ Failed to connect to {server_name}[/red]")
+
+        except Exception as e:
+            console.print(f"[red]❌ Connection error: {e}[/red]")
+
+        finally:
+            await client.close()
+
+    asyncio.run(test_connection())
+
+
+@mcp.command("config")
+@click.option("--edit", is_flag=True, help="Open config file in editor")
+@click.option("--show", is_flag=True, help="Show current configuration")
+def mcp_config(edit, show):
+    """Manage MCP configuration"""
+    try:
+        from mcp.bridge import MCPBridge
+    except ImportError:
+        console.print("[red]❌ MCP integration not found. Please install conductor with: pip install -e .[dev][/red]")
+        return
+
+    bridge = MCPBridge()
+
+    if not bridge.config_path.exists():
+        console.print("[red]❌ No MCP configuration found. Run 'conductor mcp setup' first.[/red]")
+        return
+
+    if edit:
+        try:
+            subprocess.run(['code', str(bridge.config_path)])
+            console.print(f"[green]✅ Opened config in VS Code: {bridge.config_path}[/green]")
+        except FileNotFoundError:
+            try:
+                subprocess.run(['nano', str(bridge.config_path)])
+            except FileNotFoundError:
+                console.print(f"[yellow]⚠️  Please edit manually: {bridge.config_path}[/yellow]")
+
+    if show or not edit:
+        try:
+            with open(bridge.config_path) as f:
+                config = json.load(f)
+
+            console.print(Panel.fit("[bold blue]MCP Configuration[/bold blue]", border_style="blue"))
+            console.print(f"[dim]Config file: {bridge.config_path}[/dim]")
+            console.print(f"[dim]Last modified: {datetime.fromtimestamp(bridge.config_path.stat().st_mtime)}[/dim]")
+
+            servers = config.get('mcpServers', {})
+            if servers:
+                table = Table(show_header=True, header_style="bold magenta")
+                table.add_column("Server", style="cyan")
+                table.add_column("Command", style="white")
+                table.add_column("Environment", style="dim")
+
+                for server_name, server_config in servers.items():
+                    command = f"{server_config.get('command', '')} {' '.join(server_config.get('args', []))}"
+                    env_vars = ', '.join(server_config.get('env', {}).keys())
+
+                    table.add_row(server_name, command, env_vars)
+
+                console.print(table)
+            else:
+                console.print("[yellow]⚠️  No servers configured[/yellow]")
+
+        except Exception as e:
+            console.print(f"[red]❌ Failed to read config: {e}[/red]")
 
 
 @cli.group()

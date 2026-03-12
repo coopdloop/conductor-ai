@@ -51,10 +51,19 @@ setup(
     extras_require={
         "dev": [
             "pytest>=7.0.0",
+            "pytest-cov>=4.0.0",
+            "pytest-asyncio>=0.21.0",
             "black>=23.0.0",
             "isort>=5.0.0",
             "flake8>=6.0.0",
             "mypy>=1.0.0",
+            "types-PyYAML>=6.0.12",
+            "types-Markdown>=3.4.2",
+            "types-requests>=2.31.0",
+            "aiohttp>=3.8.0",
+            "bandit>=1.7.5",
+            "detect-secrets>=1.4.0",
+            "pre-commit>=3.5.0",
         ],
     },
     entry_points={

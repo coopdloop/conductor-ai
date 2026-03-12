@@ -20,6 +20,7 @@ from core.doc_processor import DocumentProcessor
 from core.mcp_manager import MCPManager
 from core.scheduler import Scheduler
 from core.workflow_engine import WorkflowEngine
+from mcp import MCPClient, MCPToolCall
 
 
 @dataclass
@@ -45,6 +46,7 @@ class AIOrchestrator:
         self.scheduler = Scheduler()
         self.doc_processor = DocumentProcessor()
         self.mcp_manager = MCPManager()
+        self.mcp_client = MCPClient()
 
         # Initialize AI components
         self.context_engine = WorkflowContextEngine(
@@ -297,6 +299,9 @@ class AIOrchestrator:
         # Workflow actions as tools
         tools = [action.to_tool_definition() for action in self.workflow_actions]
 
+        # Add MCP tools
+        tools.extend(await self._get_mcp_tools())
+
         try:
             if stream:
                 return self._stream_conversation(
@@ -311,7 +316,7 @@ class AIOrchestrator:
             else:
                 response = await provider.generate(messages, tools, system_prompt)
 
-                # Execute any function calls
+                # Execute any function calls (including MCP tool calls)
                 if response.function_calls:
                     response = await self._execute_function_calls(response, session)
 
@@ -456,6 +461,28 @@ class AIOrchestrator:
         function_name = call["name"]
         arguments = call.get("arguments", {})
 
+        # Check if this is an MCP tool call
+        mcp_call = self._parse_mcp_call(function_name)
+        if mcp_call:
+            try:
+                mcp_call.params = arguments
+                result = await self.mcp_client.call_tool(
+                    mcp_call.server,
+                    mcp_call.tool,
+                    mcp_call.params
+                )
+                return {
+                    "function": function_name,
+                    "success": True,
+                    "result": result
+                }
+            except Exception as e:
+                return {
+                    "function": function_name,
+                    "success": False,
+                    "error": str(e)
+                }
+
         if function_name == "create_workflow":
             result = self.workflow_engine.create_workflow(
                 title=arguments["title"],
@@ -538,6 +565,49 @@ class AIOrchestrator:
                 )
 
         return "\n".join(formatted)
+
+    async def _get_mcp_tools(self) -> List[Dict[str, Any]]:
+        """Get available MCP tools as tool definitions"""
+        mcp_tools = []
+
+        try:
+            for server_name in self.mcp_client.get_available_servers():
+                tools = await self.mcp_client.list_tools(server_name)
+                for tool in tools:
+                    mcp_tools.append({
+                        "type": "function",
+                        "function": {
+                            "name": f"mcp_{server_name}_{tool.get('name', '')}",
+                            "description": f"[MCP {server_name}] {tool.get('description', '')}",
+                            "parameters": tool.get('inputSchema', {
+                                "type": "object",
+                                "properties": {},
+                                "required": []
+                            })
+                        }
+                    })
+        except Exception as e:
+            logger.error(f"Failed to get MCP tools: {e}")
+
+        return mcp_tools
+
+    def _parse_mcp_call(self, function_name: str) -> Optional[MCPToolCall]:
+        """Parse MCP function call from AI response"""
+        if not function_name.startswith('mcp_'):
+            return None
+
+        try:
+            # Extract server and tool from function name: mcp_jira_search_issues
+            parts = function_name[4:].split('_', 1)  # Remove 'mcp_' prefix
+            if len(parts) < 2:
+                return None
+
+            server = parts[0]
+            tool = parts[1]
+
+            return MCPToolCall(server=server, tool=tool, params={})
+        except Exception:
+            return None
 
     def _learn_from_interaction(
         self, user_id: str, user_input: str, response: AIResponse
