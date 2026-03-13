@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel", "setuptools-scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "conductor-docs"
+name = "conductor-ai"
 authors = [
     {name = "Conductor Team", email = "team@conductor.dev"},
 ]
