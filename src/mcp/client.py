@@ -81,7 +81,7 @@ class MCPClient:
 
             # Start the server process
             cmd = [server.command] + server.args + ['--port', str(server.port)]
-            server.process = subprocess.Popen(
+            server.process = subprocess.Popen(  # nosec B603
                 cmd,
                 env=env,
                 stdout=subprocess.PIPE,
@@ -95,7 +95,7 @@ class MCPClient:
             return True
 
         except Exception as e:
-            logger.error(f"Failed to start MCP server {server_name}: {e}")
+            logger.debug(f"Failed to start MCP server {server_name}: {e}")
             return False
 
     async def stop_server(self, server_name: str) -> bool:
@@ -129,7 +129,8 @@ class MCPClient:
         if not server.process or server.process.poll() is not None:
             success = await self.start_server(server_name)
             if not success:
-                raise RuntimeError(f"Failed to start MCP server: {server_name}")
+                logger.debug(f"Failed to start MCP server: {server_name}")
+                return {"error": f"Server {server_name} unavailable"}
 
         # Get or create connection
         if server_name not in self.connections:
@@ -171,7 +172,7 @@ class MCPClient:
             result = await self.call_tool(server_name, "list_tools", {})
             return result.get('tools', [])
         except Exception as e:
-            logger.error(f"Failed to list tools for {server_name}: {e}")
+            logger.debug(f"Failed to list tools for {server_name}: {e}")
             return []
 
     async def test_connection(self, server_name: str) -> bool:

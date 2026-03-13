@@ -262,7 +262,7 @@ class MCPBridge:
         try:
             for server in servers_to_install:
                 logger.info(f"Installing {server}...")
-                result = subprocess.run(
+                result = subprocess.run(  # nosec B603 B607
                     ['npm', 'install', '-g', server],
                     capture_output=True,
                     text=True,

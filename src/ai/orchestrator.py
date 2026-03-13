@@ -6,6 +6,7 @@ context engineering, and AI provider interactions.
 
 import asyncio
 import json
+import logging
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
@@ -21,6 +22,8 @@ from core.mcp_manager import MCPManager
 from core.scheduler import Scheduler
 from core.workflow_engine import WorkflowEngine
 from mcp import MCPClient, MCPToolCall
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass

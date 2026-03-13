@@ -1216,10 +1216,20 @@ def ai_ask(question, provider):
 
         async def ask_question():
             session_id = await orchestrator.start_conversation(provider=provider)
-            response = await orchestrator.chat(session_id, question, stream=False)
 
-            console.print(f"\n[bold blue]Question:[/bold blue] {question}")
-            console.print(f"[bold green]Answer:[/bold green] {response.content}\n")
+            console.print(f"\n[bold blue]❓ Question:[/bold blue] {question}")
+            console.print(f"[bold green]🤖 Answer:[/bold green] ", end="")
+
+            # Use streaming for a chat-like experience
+            response_stream = await orchestrator.chat(session_id, question, stream=True)
+            full_content = ""
+
+            async for chunk in response_stream:
+                console.print(chunk, end="")
+                full_content += chunk
+                await asyncio.sleep(0.01)  # Small delay for natural typing effect
+
+            console.print("\n")  # New line after streaming
 
         asyncio.run(ask_question())
 

@@ -501,7 +501,7 @@ If you have custom MCP servers:
   "command": "python",
   "args": ["/path/to/my/mcp_server.py"],
   "env": {
-    "API_KEY": "your_custom_api_key",
+    "API_KEY": "your_custom_api_key", # pragma: allowlist secret
     "SERVICE_URL": "https://my-custom-service.com"
   }
 }
