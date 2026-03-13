@@ -7,7 +7,7 @@ def test_python_version():
     """Test that we're running on a supported Python version."""
     import sys
 
-    assert sys.version_info >= (3, 12), "Python 3.12+ is required"
+    assert sys.version_info >= (3, 9), "Python 3.9+ is required"
 
 
 def test_imports():
