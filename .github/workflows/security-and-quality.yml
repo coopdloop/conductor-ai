@@ -50,7 +50,7 @@ jobs:
 
     - name: 📋 Safety Check (Known Vulnerabilities)
       run: |
-        pip install -r requirements.txt
+        pip install -e .
         safety check --json --output safety-report.json || true
         safety check
 
@@ -68,7 +68,7 @@ jobs:
 
     - name: 📊 Upload Security Reports
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
@@ -93,8 +93,7 @@ jobs:
     - name: 📦 Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install black isort flake8 mypy
-        pip install -r requirements.txt
+        pip install -e ".[dev]"
 
     - name: 🎨 Code Formatting Check (Black)
       run: |
@@ -271,7 +270,7 @@ jobs:
 
     steps:
     - name: 📥 Download Security Reports
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: security-reports
       continue-on-error: true
@@ -300,7 +299,7 @@ jobs:
         cat security-summary.md
 
     - name: 📊 Upload Security Summary
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-summary
         path: security-summary.md
